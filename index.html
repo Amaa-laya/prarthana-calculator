@@ -423,6 +423,12 @@
               h2 { color: #1976d2; }
               p { font-size: 16px; }
               h3 { margin-top: 20px; color: #f58220; }
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
+}
+
             </style>
           </head>
           <body>${content}</body>
