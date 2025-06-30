@@ -5,22 +5,175 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NSB Prarthana Savings Calculator</title>
   <style>
-    /* [Same CSS as provided above] */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: black;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      transition: margin-left 0.3s ease;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #f58220;
+    }
+    .language-selector {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+    select.language {
+      padding: 5px;
+      border-radius: 5px;
+      color: black;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #e0e0e0;
+      margin: 0 5px;
+      border-radius: 8px;
+      color: black;
+      user-select: none;
+    }
+    .tab.active {
+      background-color: #f58220;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    form {
+      border: 2px solid #f58220;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      background: #fff;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: black;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #f58220;
+      border-radius: 8px;
+      font-size: 16px;
+      color: black;
+      box-sizing: border-box;
+    }
+    input:focus, select:focus {
+      outline: 3px solid #f58220;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #f58220;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+    #result, #result2 {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #1976d2;
+      font-weight: bold;
+      white-space: pre-wrap;
+    }
+
+    /* Sidebar styles */
+    #hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    #hamburger div {
+      height: 4px;
+      background: #f58220;
+      border-radius: 2px;
+    }
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+      padding: 60px 20px 20px;
+      box-sizing: border-box;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      border-right: 3px solid #f58220;
+    }
+    #sidebar.active {
+      left: 0;
+    }
+    #sidebar button {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #f58220;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-align: left;
+    }
+    #sidebar button.active, #sidebar button:hover {
+      background-color: #f58220;
+      color: white;
+    }
+    .container.shifted {
+      margin-left: 250px;
+    }
   </style>
 </head>
 <body>
-  <!-- Hamburger icon -->
   <div id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
     <div></div><div></div><div></div>
   </div>
-
-  <!-- Sidebar -->
   <nav id="sidebar" aria-label="Main navigation">
     <button id="prarthanaBtn" class="active">Prarthana Savings</button>
     <button id="realityBtn">Reality Savings</button>
   </nav>
 
-  <!-- Main Content -->
   <div class="container" id="mainContainer">
     <div class="language-selector">
       <select class="language" onchange="changeLanguage(this.value)">
@@ -29,70 +182,65 @@
         <option value="ta">தமிழ்</option>
       </select>
     </div>
-    <h2 data-i18n="title">NSB Prarthana Savings Calculator</h2>
+    <h2 id="mainTitle">NSB Prarthana Savings Calculator</h2>
+
     <div class="tabs">
-      <div class="tab active" onclick="showTab('tab1', this)" data-i18n="tab1">🪙 Required Deposit</div>
-      <div class="tab" onclick="showTab('tab2', this)" data-i18n="tab2">💰 Maturity Value</div>
+      <div class="tab active" onclick="showTab('tab1', this)">🪙 Required Deposit</div>
+      <div class="tab" onclick="showTab('tab2', this)">💰 Maturity Value</div>
     </div>
 
     <div id="tab1" class="tab-content active">
-      <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
-        <label for="openingDate" data-i18n="labelOpeningDate">Opening Date:</label>
+      <form onsubmit="event.preventDefault(); calculateDeposit();">
+        <label for="openingDate">Opening Date:</label>
         <input type="date" id="openingDate" required />
 
-        <label for="period" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <label for="period">Maturity Period (Years):</label>
         <select id="period" required>
-          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="" disabled selected>Select Maturity Period</option>
           <option value="3">3 years</option>
           <option value="5">5 years</option>
           <option value="10">10 years</option>
-          <option value="15">15 years</option>
-          <option value="20">20 years</option>
         </select>
 
-        <label for="maturityDate" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <label for="maturityDate">Maturity Date:</label>
         <input type="date" id="maturityDate" disabled />
 
-        <label for="expectedAmount" data-i18n="labelExpectedAmount">Expected Maturity Amount (LKR):</label>
+        <label for="expectedAmount">Expected Maturity Amount (LKR):</label>
         <input type="number" id="expectedAmount" placeholder="e.g. 100000" required />
 
-        <label for="interestRate" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <label for="interestRate">Interest Rate (%):</label>
         <input type="number" id="interestRate" placeholder="e.g. 7.5" step="0.01" required />
 
-        <button type="submit" data-i18n="calculate">Calculate Deposit</button>
-        <button type="button" onclick="printResult('tab1')" data-i18n="print">🖨️ Print</button>
-        <button type="button" onclick="saveToLocal('result')" data-i18n="save">💾 Save</button>
+        <button type="submit">Calculate Deposit</button>
+        <button type="button" onclick="printResult('result')">🖨️ Print</button>
       </form>
       <div id="result"></div>
     </div>
 
     <div id="tab2" class="tab-content">
-      <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
-        <label for="openingDate2" data-i18n="labelOpeningDate">Opening Date:</label>
+      <form onsubmit="event.preventDefault(); calculateMaturity();">
+        <label for="openingDate2">Opening Date:</label>
         <input type="date" id="openingDate2" required />
 
-        <label for="period2" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <label for="period2">Maturity Period (Years):</label>
         <select id="period2" required>
-          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="" disabled selected>Select Maturity Period</option>
           <option value="3">3 years</option>
           <option value="5">5 years</option>
           <option value="10">10 years</option>
-          <option value="15">15 years</option>
-          <option value="20">20 years</option>
         </select>
 
-        <label for="maturityDate2" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <label for="maturityDate2">Maturity Date:</label>
         <input type="date" id="maturityDate2" disabled />
 
-        <label for="depositAmount" data-i18n="labelDepositAmount">Deposit Amount (LKR):</label>
+        <label for="depositAmount">Deposit Amount (LKR):</label>
         <input type="number" id="depositAmount" placeholder="e.g. 50000" required />
 
-        <label for="interestRate2" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <label for="interestRate2">Interest Rate (%):</label>
         <input type="number" id="interestRate2" placeholder="e.g. 7.5" step="0.01" required />
 
-        <button type="submit" data-i18n="calculate">Calculate Maturity</button>
-        <button type="button" onclick="printResult('tab2')" data-i18n="print">🖨️ Print</button>
-        <button type="button" onclick="saveToLocal('result2')" data-i18n="save">💾 Save</button>
+        <button type="submit">Calculate Maturity</button>
+        <button type="button" onclick="printResult('result2')">🖨️ Print</button>
       </form>
       <div id="result2"></div>
     </div>
@@ -102,69 +250,47 @@
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
     const container = document.getElementById('mainContainer');
+    const title = document.getElementById('mainTitle');
 
     hamburger.addEventListener('click', () => {
       sidebar.classList.toggle('active');
       container.classList.toggle('shifted');
     });
-    hamburger.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        hamburger.click();
-      }
+
+    document.getElementById('prarthanaBtn').addEventListener('click', () => {
+      title.textContent = "NSB Prarthana Savings Calculator";
+      toggleSidebarButtons('prarthanaBtn', 'realityBtn');
     });
 
-    const prarthanaBtn = document.getElementById('prarthanaBtn');
-    const realityBtn = document.getElementById('realityBtn');
-    prarthanaBtn.addEventListener('click', () => {
-      prarthanaBtn.classList.add('active');
-      realityBtn.classList.remove('active');
-      alert('Show Prarthana Savings form (to be implemented)');
+    document.getElementById('realityBtn').addEventListener('click', () => {
+      title.textContent = "NSB Reality Savings Calculator";
+      toggleSidebarButtons('realityBtn', 'prarthanaBtn');
+    });
+
+    function toggleSidebarButtons(activeId, inactiveId) {
+      document.getElementById(activeId).classList.add('active');
+      document.getElementById(inactiveId).classList.remove('active');
       sidebar.classList.remove('active');
       container.classList.remove('shifted');
-    });
-    realityBtn.addEventListener('click', () => {
-      realityBtn.classList.add('active');
-      prarthanaBtn.classList.remove('active');
-      alert('Show Reality Savings form (to be implemented)');
-      sidebar.classList.remove('active');
-      container.classList.remove('shifted');
-    });
+    }
 
     function showTab(tabId, tabElement) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       tabElement.classList.add('active');
     }
-
-    function calculateMaturityDate(openingId, periodId, maturityId) {
-      const openingDate = new Date(document.getElementById(openingId).value);
-      const years = parseInt(document.getElementById(periodId).value);
-      if (!isNaN(openingDate.getTime()) && years) {
-        openingDate.setFullYear(openingDate.getFullYear() + years);
-        document.getElementById(maturityId).value = openingDate.toISOString().split('T')[0];
-      } else {
-        document.getElementById(maturityId).value = "";
-      }
-    }
-
-    document.getElementById('period').addEventListener('change', () =>
-      calculateMaturityDate('openingDate', 'period', 'maturityDate'));
-    document.getElementById('period2').addEventListener('change', () =>
-      calculateMaturityDate('openingDate2', 'period2', 'maturityDate2'));
 
     function calculateDeposit() {
       const rate = parseFloat(document.getElementById("interestRate").value) / 100;
       const years = parseInt(document.getElementById("period").value);
       const expected = parseFloat(document.getElementById("expectedAmount").value);
       if (isNaN(rate) || isNaN(years) || isNaN(expected)) {
-        alert('Please calculate first.');
+        alert('Please fill all fields');
         return;
       }
       const deposit = expected / Math.pow(1 + rate, years);
-      const resultText = `Required Deposit: Rs. ${deposit.toFixed(2)}`;
-      document.getElementById("result").innerText = resultText;
+      document.getElementById("result").innerText = `Required Deposit: Rs. ${deposit.toFixed(2)}`;
     }
 
     function calculateMaturity() {
@@ -172,27 +298,32 @@
       const years = parseInt(document.getElementById("period2").value);
       const deposit = parseFloat(document.getElementById("depositAmount").value);
       if (isNaN(rate) || isNaN(years) || isNaN(deposit)) {
-        alert('Please calculate first.');
+        alert('Please fill all fields');
         return;
       }
       const maturity = deposit * Math.pow(1 + rate, years);
-      const resultText = `Maturity Value: Rs. ${maturity.toFixed(2)}`;
-      document.getElementById("result2").innerText = resultText;
+      document.getElementById("result2").innerText = `Maturity Value: Rs. ${maturity.toFixed(2)}`;
     }
 
-    function printResult(tabId) {
-      const content = document.getElementById(tabId === 'tab1' ? 'result' : 'result2').innerText;
-      const printWindow = window.open('', '', 'height=600,width=800');
-      printWindow.document.write('<pre>' + content + '</pre>');
+    function printResult(resultId) {
+      const result = document.getElementById(resultId).innerText;
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`<pre>${result}</pre>`);
       printWindow.document.close();
       printWindow.print();
     }
 
-    function saveToLocal(resultId) {
-      const result = document.getElementById(resultId).innerText;
-      if (result) {
-        localStorage.setItem(resultId, result);
-        alert('Saved to browser storage.');
+    document.getElementById('period').addEventListener('change', () =>
+      setMaturityDate('openingDate', 'period', 'maturityDate'));
+    document.getElementById('period2').addEventListener('change', () =>
+      setMaturityDate('openingDate2', 'period2', 'maturityDate2'));
+
+    function setMaturityDate(openId, periodId, outputId) {
+      const date = new Date(document.getElementById(openId).value);
+      const years = parseInt(document.getElementById(periodId).value);
+      if (!isNaN(date) && years) {
+        date.setFullYear(date.getFullYear() + years);
+        document.getElementById(outputId).value = date.toISOString().split('T')[0];
       }
     }
   </script>
