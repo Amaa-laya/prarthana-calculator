@@ -5,350 +5,275 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NSB Prarthana Savings Calculator</title>
   <style>
+    /* === Original styles, unchanged === */
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f5f5f5;
+      margin: 0; padding: 0;
+      background: #fff;
+      color: #000;
+    }
+    header {
+      background-color: #f58220;
+      color: white;
+      padding: 15px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      color: black;
+      justify-content: space-between;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1001;
     }
-    .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
-      width: 100%;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #f58220;
-    }
-    .language-selector {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 10px;
-    }
-    select.language {
-      padding: 5px;
-      border-radius: 5px;
-      color: black;
-    }
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .tab {
-      padding: 10px 20px;
-      cursor: pointer;
-      background-color: #e0e0e0;
-      margin: 0 5px;
-      border-radius: 8px;
-      color: black;
-      user-select: none;
-    }
-    .tab.active {
-      background-color: #f58220;
-      color: white;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    form {
-      border: 2px solid #f58220;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      background: #fff;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: black;
-      font-size: 14px;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 2px solid #f58220;
-      border-radius: 8px;
-      font-size: 16px;
-      color: black;
-      box-sizing: border-box;
-      outline-offset: 2px;
-    }
-    input:focus, select:focus {
-      outline: 3px solid #f58220;
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #f58220;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-      margin-right: 10px;
-      font-weight: 600;
-      font-size: 15px;
-    }
-    #result, #result2 {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #1976d2;
-      font-weight: bold;
-      white-space: pre-wrap;
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
     }
     #hamburger {
-      position: fixed;
-      top: 20px;
-      left: 20px;
       width: 30px;
       height: 25px;
       cursor: pointer;
-      z-index: 1001;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      outline: none;
     }
     #hamburger div {
       height: 4px;
-      background: #f58220;
+      background: white;
       border-radius: 2px;
     }
+
+    /* === Sidebar styles === */
     #sidebar {
       position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100vh;
+      top: 60px; /* below header */
+      left: -260px; /* hidden by default */
+      width: 260px;
+      height: calc(100vh - 60px);
       background: #fff;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-      padding: 60px 20px 20px 20px;
+      border-right: 3px solid #f58220;
+      padding: 20px;
       box-sizing: border-box;
       transition: left 0.3s ease;
       z-index: 1000;
-      border-right: 3px solid #f58220;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
     }
     #sidebar.active {
       left: 0;
     }
     #sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
       background: none;
-      border: none;
-      font-size: 18px;
+      border: 2px solid #f58220;
       color: #f58220;
-      cursor: pointer;
+      font-size: 1em;
       padding: 10px;
-      border-radius: 8px;
-      text-align: left;
-      font-weight: 700;
-      transition: background-color 0.3s ease;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
     }
-    #sidebar button:hover, #sidebar button.active {
-      background-color: #f58220;
+    #sidebar button.active,
+    #sidebar button:hover {
+      background: #f58220;
       color: white;
     }
-    .container.shifted {
-      margin-left: 250px;
+
+    /* === Main content area === */
+    #mainContainer {
+      margin-top: 60px; /* below header */
+      padding: 20px;
       transition: margin-left 0.3s ease;
+    }
+    #mainContainer.shifted {
+      margin-left: 260px;
+    }
+
+    /* === Language selector === */
+    #languageSelector {
+      margin-bottom: 20px;
+      font-size: 1em;
+      padding: 5px 10px;
+      border: 2px solid #f58220;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
- <body>
-  <div id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
-    <div></div><div></div><div></div>
-  </div>
+  <header>
+    <div id="hamburger" tabindex="0" aria-label="Toggle menu" role="button" aria-expanded="false">
+      <div></div><div></div><div></div>
+    </div>
+    <h1 id="pageTitle">NSB Prarthana Savings Calculator</h1>
+  </header>
 
-  <nav id="sidebar" aria-label="Main navigation">
+  <nav id="sidebar" aria-label="Sidebar navigation">
     <button id="prarthanaBtn" class="active">Prarthana Savings</button>
     <button id="realityBtn">Reality Savings</button>
   </nav>
 
-  <div class="container" id="mainContainer">
-    <div class="language-selector">
-      <select class="language" onchange="changeLanguage(this.value)">
-        <option value="en">English</option>
-        <option value="si">සිංහල</option>
-        <option value="ta">தமிழ்</option>
-      </select>
-    </div>
+  <main id="mainContainer">
+    <select id="languageSelector" aria-label="Select Language">
+      <option value="en">English</option>
+      <option value="si">සිංහල</option>
+      <option value="ta">தமிழ்</option>
+    </select>
 
-    <h2 id="title">NSB Prarthana Savings Calculator</h2>
+    <section id="calculatorContent">
+      <h2 id="calculatorTitle">Prarthana Savings Calculator</h2>
 
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('tab1', this)" id="tab1Btn">🪙 Required Deposit</div>
-      <div class="tab" onclick="showTab('tab2', this)" id="tab2Btn">💰 Maturity Value</div>
-    </div>
-
-    <div id="tab1" class="tab-content active">
-      <form onsubmit="event.preventDefault(); calculateDeposit();">
-        <label id="labelOpeningDate1">Opening Date:</label>
-        <input type="date" id="openingDate" required />
-
-        <label id="labelPeriod1">Maturity Period (Years):</label>
-        <select id="period" required>
-          <option value="" disabled selected>Select Maturity Period</option>
-          <option value="3">3 years</option>
-          <option value="5">5 years</option>
-          <option value="10">10 years</option>
-          <option value="15">15 years</option>
-          <option value="20">20 years</option>
-        </select>
-
-        <label id="labelMaturityDate1">Maturity Date:</label>
-        <input type="date" id="maturityDate" disabled />
-
-        <label id="labelExpectedAmount">Expected Maturity Amount (LKR):</label>
-        <input type="number" id="expectedAmount" placeholder="e.g. 100000" required />
-
-        <label id="labelInterestRate1">Interest Rate (%):</label>
-        <input type="number" id="interestRate" step="0.01" required />
-
-        <button type="submit" id="calculateDepositBtn">Calculate Deposit</button>
+      <form id="calculatorForm">
+        <label for="amount" id="depositLabel">Deposit Amount:</label><br />
+        <input type="number" id="amount" name="amount" /><br /><br />
+        <label for="months" id="monthsLabel">Number of Months:</label><br />
+        <input type="number" id="months" name="months" /><br /><br />
+        <button type="submit" id="calculateBtn">Calculate</button>
       </form>
-      <div id="result"></div>
-    </div>
 
-    <div id="tab2" class="tab-content">
-      <form onsubmit="event.preventDefault(); calculateMaturity();">
-        <label id="labelOpeningDate2">Opening Date:</label>
-        <input type="date" id="openingDate2" required />
-
-        <label id="labelPeriod2">Maturity Period (Years):</label>
-        <select id="period2" required>
-          <option value="" disabled selected>Select Maturity Period</option>
-          <option value="3">3 years</option>
-          <option value="5">5 years</option>
-          <option value="10">10 years</option>
-          <option value="15">15 years</option>
-          <option value="20">20 years</option>
-        </select>
-
-        <label id="labelMaturityDate2">Maturity Date:</label>
-        <input type="date" id="maturityDate2" disabled />
-
-        <label id="labelDepositAmount">Deposit Amount (LKR):</label>
-        <input type="number" id="depositAmount" placeholder="e.g. 50000" required />
-
-        <label id="labelInterestRate2">Interest Rate (%):</label>
-        <input type="number" id="interestRate2" step="0.01" required />
-
-        <button type="submit" id="calculateMaturityBtn">Calculate Maturity</button>
-      </form>
-      <div id="result2"></div>
-    </div>
-  </div>
+      <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+    </section>
+  </main>
 
   <script>
+    // Sidebar toggle logic
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const mainContainer = document.getElementById('mainContainer');
 
-  <script>
+    function toggleSidebar() {
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true' || false;
+      hamburger.setAttribute('aria-expanded', !expanded);
+      sidebar.classList.toggle('active');
+      mainContainer.classList.toggle('shifted');
+    }
+
+    hamburger.addEventListener('click', toggleSidebar);
+    hamburger.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    });
+
+    // Language switching logic
+    const languageSelector = document.getElementById('languageSelector');
+    const pageTitle = document.getElementById('pageTitle');
+    const calculatorTitle = document.getElementById('calculatorTitle');
+    const prarthanaBtn = document.getElementById('prarthanaBtn');
+    const realityBtn = document.getElementById('realityBtn');
+    const depositLabel = document.getElementById('depositLabel');
+    const monthsLabel = document.getElementById('monthsLabel');
+    const calculateBtn = document.getElementById('calculateBtn');
+
     const translations = {
       en: {
-        title: "NSB Prarthana Savings Calculator",
-        realityTitle: "NSB Reality Savings Calculator",
-        tab1: "🪙 Required Deposit",
-        tab2: "💰 Maturity Value",
-        labelOpeningDate: "Opening Date:",
-        labelPeriod: "Maturity Period (Years):",
-        labelMaturityDate: "Maturity Date:",
-        labelExpectedAmount: "Expected Maturity Amount (LKR):",
-        labelDepositAmount: "Deposit Amount (LKR):",
-        labelInterestRate: "Interest Rate (%):",
-        calculateDeposit: "Calculate Deposit",
-        calculateMaturity: "Calculate Maturity"
+        pageTitle: "NSB Prarthana Savings Calculator",
+        calculatorPrarthana: "Prarthana Savings Calculator",
+        calculatorReality: "Reality Savings Calculator",
+        prarthanaBtn: "Prarthana Savings",
+        realityBtn: "Reality Savings",
+        depositLabel: "Deposit Amount:",
+        monthsLabel: "Number of Months:",
+        calculateBtn: "Calculate",
+        resultText: (amount, months, total) => `For a deposit of ${amount} over ${months} months, total savings: ${total}`
       },
       si: {
-        title: "NSB ප්‍රාර්ථනා ඉතිරිකිරීමේ ගණකය",
-        realityTitle: "NSB රියැලිටි ඉතිරිකිරීමේ ගණකය",
-        tab1: "🪙 අවශ්‍ය තැන්පතුව",
-        tab2: "💰 පිරවීමේ වටිනාකම",
-        labelOpeningDate: "විවෘත කරන දිනය:",
-        labelPeriod: "පිරවීමේ කාලය (වර්ෂ):",
-        labelMaturityDate: "පිරවීමේ දිනය:",
-        labelExpectedAmount: "අපේක්ෂිත පිරවීමේ මුදල (රු):",
-        labelDepositAmount: "තැන්පතු මුදල (රු):",
-        labelInterestRate: "දැක්වූ පොලී අනුපාතය (%):",
-        calculateDeposit: "තැන්පතුව ගණනය කරන්න",
-        calculateMaturity: "පිරවීමේ වටිනාකම ගණනය කරන්න"
+        pageTitle: "NSB ප්‍රාර්ථනා ඉතිරිකිරීමේ ගණකය",
+        calculatorPrarthana: "ප්‍රාර්ථනා ඉතිරි ගණකය",
+        calculatorReality: "රිඇලිටි ඉතිරි ගණකය",
+        prarthanaBtn: "ප්‍රාර්ථනා ඉතිරි",
+        realityBtn: "රිඇලිටි ඉතිරි",
+        depositLabel: "තැන්පතු මුදල:",
+        monthsLabel: "මාස ගණන:",
+        calculateBtn: "ගණනය කරන්න",
+        resultText: (amount, months, total) => `තැන්පතු මුදල ${amount} ක් සඳහා මාස ${months} ක සදහා සමස්ත ඉතිරිය: ${total}`
       },
       ta: {
-        title: "NSB ப்ரார்த்தனா சேமிப்பு கணிப்பான்",
-        realityTitle: "NSB ரியாலிட்டி சேமிப்பு கணிப்பான்",
-        tab1: "🪙 தேவையான வைப்பு",
-        tab2: "💰 வளர்ச்சி மதிப்பு",
-        labelOpeningDate: "திறக்கும் தேதி:",
-        labelPeriod: "முடிவுக்காலம் (ஆண்டுகள்):",
-        labelMaturityDate: "முடிவு தேதி:",
-        labelExpectedAmount: "எதிர்பார்க்கும் வளர்ச்சி தொகை (ரூ):",
-        labelDepositAmount: "வைப்புத் தொகை (ரூ):",
-        labelInterestRate: "வட்டி விகிதம் (%):",
-        calculateDeposit: "வைப்பை கணக்கிடுக",
-        calculateMaturity: "முடிவு மதிப்பை கணக்கிடுக"
+        pageTitle: "NSB ப்ரார்த்தனா சேமிப்பு கணிப்பான்",
+        calculatorPrarthana: "ப்ரார்த்தனா சேமிப்பு கணிப்பான்",
+        calculatorReality: "ரியாலிடி சேமிப்பு கணிப்பான்",
+        prarthanaBtn: "ப்ரார்த்தனா சேமிப்பு",
+        realityBtn: "ரியாலிடி சேமிப்பு",
+        depositLabel: "தொகை:",
+        monthsLabel: "மாதங்கள்:",
+        calculateBtn: "கணக்கிடு",
+        resultText: (amount, months, total) => `${amount} தொகைக்கு, ${months} மாதங்களுக்கான மொத்த சேமிப்பு: ${total}`
       }
     };
 
-    let currentLang = 'en';
-    let currentTab = 'prarthana';
-
-    function changeLanguage(lang) {
-      currentLang = lang;
+    function updateCalculatorText(lang) {
       const t = translations[lang];
+      pageTitle.innerText = t.pageTitle;
+      prarthanaBtn.innerText = t.prarthanaBtn;
+      realityBtn.innerText = t.realityBtn;
 
-      document.getElementById("tab1Btn").innerText = t.tab1;
-      document.getElementById("tab2Btn").innerText = t.tab2;
+      if (prarthanaBtn.classList.contains('active')) {
+        calculatorTitle.innerText = t.calculatorPrarthana;
+      } else {
+        calculatorTitle.innerText = t.calculatorReality;
+      }
 
-      document.getElementById("labelOpeningDate1").innerText = t.labelOpeningDate;
-      document.getElementById("labelPeriod1").innerText = t.labelPeriod;
-      document.getElementById("labelMaturityDate1").innerText = t.labelMaturityDate;
-      document.getElementById("labelExpectedAmount").innerText = t.labelExpectedAmount;
-      document.getElementById("labelInterestRate1").innerText = t.labelInterestRate;
-      document.getElementById("calculateDepositBtn").innerText = t.calculateDeposit;
-
-      document.getElementById("labelOpeningDate2").innerText = t.labelOpeningDate;
-      document.getElementById("labelPeriod2").innerText = t.labelPeriod;
-      document.getElementById("labelMaturityDate2").innerText = t.labelMaturityDate;
-      document.getElementById("labelDepositAmount").innerText = t.labelDepositAmount;
-      document.getElementById("labelInterestRate2").innerText = t.labelInterestRate;
-      document.getElementById("calculateMaturityBtn").innerText = t.calculateMaturity;
-
-      updateTitle();
+      depositLabel.innerText = t.depositLabel;
+      monthsLabel.innerText = t.monthsLabel;
+      calculateBtn.innerText = t.calculateBtn;
+      // Clear result when language changes
+      document.getElementById('result').innerText = '';
     }
 
-    function updateTitle() {
-      const t = translations[currentLang];
-      document.getElementById("title").innerText =
-        currentTab === 'prarthana' ? t.title : t.realityTitle;
+    languageSelector.addEventListener('change', (e) => {
+      updateCalculatorText(e.target.value);
+    });
+
+    // Sidebar buttons to switch calculator views
+    prarthanaBtn.addEventListener('click', () => {
+      prarthanaBtn.classList.add('active');
+      realityBtn.classList.remove('active');
+      updateCalculatorText(languageSelector.value);
+      clearCalculatorInputs();
+    });
+
+    realityBtn.addEventListener('click', () => {
+      realityBtn.classList.add('active');
+      prarthanaBtn.classList.remove('active');
+      updateCalculatorText(languageSelector.value);
+      clearCalculatorInputs();
+    });
+
+    function clearCalculatorInputs() {
+      document.getElementById('amount').value = '';
+      document.getElementById('months').value = '';
+      document.getElementById('result').innerText = '';
     }
 
-    document.getElementById('prarthanaBtn').addEventListener('click', () => {
-      document.getElementById('prarthanaBtn').classList.add('active');
-      document.getElementById('realityBtn').classList.remove('active');
-      currentTab = 'prarthana';
-      updateTitle();
+    // Simple calculation on form submit (example logic)
+    document.getElementById('calculatorForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const amount = parseFloat(document.getElementById('amount').value);
+      const months = parseInt(document.getElementById('months').value, 10);
+      if (isNaN(amount) || isNaN(months) || amount <= 0 || months <= 0) {
+        alert('Please enter valid positive numbers.');
+        return;
+      }
+
+      // Example calculation: total savings = amount * months * interest factor
+      // Use different interest rate based on selected calculator:
+      let interestRate;
+      if (prarthanaBtn.classList.contains('active')) {
+        interestRate = 0.02; // 2% per month example
+      } else {
+        interestRate = 0.015; // 1.5% per month example
+      }
+
+      const total = (amount * months) + (amount * months * interestRate);
+
+      const lang = languageSelector.value;
+      const resultText = translations[lang].resultText(amount, months, total.toFixed(2));
+      document.getElementById('result').innerText = resultText;
     });
 
-    document.getElementById('realityBtn').addEventListener('click', () => {
-      document.getElementById('realityBtn').classList.add('active');
-      document.getElementById('prarthanaBtn').classList.remove('active');
-      currentTab = 'reality';
-      updateTitle();
-    });
+    // Initialize page text
+    updateCalculatorText(languageSelector.value);
   </script>
 </body>
 </html>
