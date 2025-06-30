@@ -1,172 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NSB Prarthana Savings Calculator</title>
+  <title>Savings Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      font-family: 'Noto Sans Sinhala', sans-serif;
       margin: 0;
+      display: flex;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #002f5f;
+      color: white;
       padding: 20px;
+      height: 100vh;
     }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
     }
-    h1, h2 {
-      text-align: center;
-    }
-    label, select, input, button {
+    .sidebar button {
       display: block;
+      background: none;
+      border: none;
+      color: white;
+      padding: 10px;
       width: 100%;
-      margin: 10px 0;
+      text-align: left;
+      cursor: pointer;
+      font-size: 16px;
     }
-    .lang-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
+    .sidebar button:hover {
+      background-color: #004080;
     }
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-    .actions button {
+    .content {
+      padding: 30px;
       flex: 1;
-      margin: 5px;
     }
-    .result {
-      font-size: 1.2em;
-      color: green;
-      text-align: center;
+    label, select, input {
+      display: block;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .buttons {
+      margin-top: 20px;
+    }
+    button.action {
+      background-color: #004080;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 18px;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1 id="title">NSB Prarthana Savings Calculator</h1>
-    <div class="lang-buttons">
-      <button onclick="setLanguage('en')">English</button>
-      <button onclick="setLanguage('si')">සිංහාල</button>
-      <button onclick="setLanguage('ta')">தமிழ்</button>
-    </div>
+  <div class="sidebar">
+    <h2>සුරක්ෂිත සේවාවන්</h2>
+    <button onclick="selectCalculator('prarthana')">🌼 පර්ථනා මුදල් යෝජනා</button>
+    <button onclick="selectCalculator('reality')">💰 රියැලිටි ඉතිරිම</button>
+  </div>
 
-    <label id="amountLabel">Monthly Deposit Amount (LKR):</label>
-    <input type="number" id="monthlyAmount" placeholder="e.g. 5000">
+  <div class="content">
+    <h1 id="title">🌼 පර්ථනා මුදල් යෝජනා</h1>
 
-    <label id="yearsLabel">Number of Years:</label>
-    <input type="number" id="years" placeholder="e.g. 5">
+    <form id="savingsForm">
+      <label for="amount">මුදල (රු.):</label>
+      <input type="number" id="amount" name="amount" required>
 
-    <label id="interestLabel">Annual Interest Rate (%):</label>
-    <input type="number" id="interestRate" placeholder="e.g. 5">
+      <label for="period">කාලය:</label>
+      <select id="period" name="period">
+        <!-- options will be populated dynamically -->
+      </select>
 
-    <div class="actions">
-      <button onclick="calculate()" id="calculateBtn">Calculate</button>
-      <button onclick="speakInstructions()" id="voiceBtn">🔊 Voice</button>
-      <button onclick="saveToBrowser()" id="saveBtn">💾 Save</button>
-      <button onclick="printPage()" id="printBtn">🖨️ Print/PDF</button>
-    </div>
+      <div class="buttons">
+        <button class="action" type="button" onclick="calculateSavings()">ගණනය කරන්න</button>
+        <button class="action" type="button" onclick="window.print()">මුද්‍රණය</button>
+      </div>
+    </form>
 
-    <div class="result" id="result"></div>
+    <div id="result"></div>
   </div>
 
   <script>
-    const langData = {
-      en: {
-        title: "NSB Prarthana Savings Calculator",
-        amountLabel: "Monthly Deposit Amount (LKR):",
-        yearsLabel: "Number of Years:",
-        interestLabel: "Annual Interest Rate (%):",
-        calculateBtn: "Calculate",
-        voiceBtn: "🔊 Voice",
-        saveBtn: "💾 Save",
-        printBtn: "🖨️ Print/PDF"
-      },
-      si: {
-        title: "NSB ප්‍රර්තන සන්නා කල්දකාර්",
-        amountLabel: "මාසනාම ඕ්‍රිද රසල් (LKR):",
-        yearsLabel: "සන්නාස සිරයාලු:",
-        interestLabel: "ස්‍රාමප්රය ගැරමුන් (%):",
-        calculateBtn: "ගණනය කරන්න",
-        voiceBtn: "🔊 ශබ්දය",
-        saveBtn: "💾 සුරකින්න",
-        printBtn: "🖨️ මුද්‍රණය"
-      },
-      ta: {
-        title: "NSB பிரார்த்தனா சொட்டு சலபெரு கணகுப்பு",
-        amountLabel: "மாதமான முடலை செலவை (LKR):",
-        yearsLabel: "ஆண்டு வருடகள்:",
-        interestLabel: "வருட பிரிவு விதியாஸு (%) :",
-        calculateBtn: "கணக்கிடு",
-        voiceBtn: "🔊 ஒலி",
-        saveBtn: "💾 சேமி",
-        printBtn: "🖨️ அச்சிடு"
-      }
+    const periodOptions = {
+      prarthana: [3, 5, 10, 15, 20],
+      reality: [12, 24, 36, 48, 60]
     };
 
-    function setLanguage(lang) {
-      const data = langData[lang];
-      document.getElementById('title').innerText = data.title;
-      document.getElementById('amountLabel').innerText = data.amountLabel;
-      document.getElementById('yearsLabel').innerText = data.yearsLabel;
-      document.getElementById('interestLabel').innerText = data.interestLabel;
-      document.getElementById('calculateBtn').innerText = data.calculateBtn;
-      document.getElementById('voiceBtn').innerText = data.voiceBtn;
-      document.getElementById('saveBtn').innerText = data.saveBtn;
-      document.getElementById('printBtn').innerText = data.printBtn;
+    let currentCalculator = 'prarthana';
+
+    function selectCalculator(type) {
+      currentCalculator = type;
+      document.getElementById('title').textContent =
+        type === 'prarthana' ? '🌼 පර්ථනා මුදල් යෝජනා' : '💰 රියැලිටි ඉතිරිම';
+      populatePeriods();
+      document.getElementById('result').textContent = '';
     }
 
-    function calculate() {
-      const monthly = parseFloat(document.getElementById('monthlyAmount').value);
-      const years = parseFloat(document.getElementById('years').value);
-      const rate = parseFloat(document.getElementById('interestRate').value);
-      if (isNaN(monthly) || isNaN(years) || isNaN(rate)) {
-        alert("Please enter valid numbers");
+    function populatePeriods() {
+      const periodSelect = document.getElementById('period');
+      periodSelect.innerHTML = '';
+      periodOptions[currentCalculator].forEach(period => {
+        const option = document.createElement('option');
+        option.value = period;
+        option.textContent = `${period} ${currentCalculator === 'prarthana' ? 'වසර' : 'මාස'}`;
+        periodSelect.appendChild(option);
+      });
+    }
+
+    function calculateSavings() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const period = parseInt(document.getElementById('period').value);
+      let total;
+
+      if (isNaN(amount) || isNaN(period)) {
+        document.getElementById('result').textContent = 'කරුණාකර සියලු තොරතුරු ඇතුළත් කරන්න';
         return;
       }
-      const n = 12;
-      const r = rate / 100 / n;
-      const months = years * 12;
-      const futureValue = monthly * (((Math.pow(1 + r, months)) - 1) / r);
-      document.getElementById('result').innerText =
-        `Future Savings Value: LKR ${futureValue.toFixed(2)}`;
-    }
 
-    function speakInstructions() {
-      const msg = new SpeechSynthesisUtterance("Please enter the monthly deposit, number of years, and interest rate. Then press calculate.");
-      window.speechSynthesis.speak(msg);
-    }
-
-    function saveToBrowser() {
-      const data = {
-        monthly: document.getElementById('monthlyAmount').value,
-        years: document.getElementById('years').value,
-        rate: document.getElementById('interestRate').value
-      };
-      localStorage.setItem("savingsData", JSON.stringify(data));
-      alert("Saved to browser storage");
-    }
-
-    function loadFromBrowser() {
-      const data = JSON.parse(localStorage.getItem("savingsData"));
-      if (data) {
-        document.getElementById('monthlyAmount').value = data.monthly;
-        document.getElementById('years').value = data.years;
-        document.getElementById('interestRate').value = data.rate;
+      if (currentCalculator === 'prarthana') {
+        total = amount * period * 12;
+      } else {
+        total = amount * period;
       }
+
+      document.getElementById('result').textContent = `මුළු ඉතිරි මුදල: රු. ${total.toLocaleString()}`;
     }
 
-    function printPage() {
-      window.print();
-    }
-
-    window.onload = loadFromBrowser;
+    populatePeriods();
   </script>
 </body>
+
 </html>
