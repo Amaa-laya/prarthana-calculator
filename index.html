@@ -110,6 +110,49 @@
       font-weight: bold;
       white-space: pre-wrap; /* to keep line breaks */
     }
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  left: -250px;
+  top: 0;
+  height: 100%;
+  width: 250px;
+  background-color: #f58220;
+  transition: left 0.3s ease;
+  padding-top: 60px;
+  z-index: 1000;
+  color: white;
+  font-weight: bold;
+}
+.sidebar.open {
+  left: 0;
+}
+.sidebar a {
+  display: block;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+}
+.sidebar a:hover {
+  background-color: #e06d0f;
+}
+
+/* Hamburger Icon */
+.hamburger {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 1100;
+  color: #f58220;
+  background-color: white;
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
   </style>
 </head>
 <body>
@@ -193,7 +236,7 @@
   <script>
     const translations = {
       en: {
-        title: "Prarthana Savings Calculator",
+        title: "NSB Prarthana Savings Calculator",
         tab1: "🪙 Required Deposit",
         tab2: "💰 Maturity Value",
         calculate: "Calculate",
@@ -210,7 +253,7 @@
         alertSaved: "Saved successfully to your browser!"
       },
       si: {
-        title: "ප්‍රාර්ථනා ඉතිරි කිරීම ගණකය",
+        title: "NSB ප්‍රාර්ථනා ඉතිරි කිරීම ගණකය",
         tab1: "🪙 අවශ්‍ය තැන්පතුව",
         tab2: "💰 පරිපූර්ණ අගය",
         calculate: "ගණනය කරන්න",
@@ -227,7 +270,7 @@
         alertSaved: "ඔබගේ බ්‍රවුසර්ට සාර්ථකව සුරකින්න!"
       },
       ta: {
-        title: "பிரார்த்தனா சேமிப்பு கால்குலேட்டர்",
+        title: "NSB பிரார்த்தனா சேமிப்பு கால்குலேட்டர்",
         tab1: "🪙 தேவையான வைப்பு",
         tab2: "💰 முதிர்ச்சி மதிப்பு",
         calculate: "கணக்கிடுக",
