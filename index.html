@@ -110,9 +110,82 @@
       font-weight: bold;
       white-space: pre-wrap; /* to keep line breaks */
     }
+/* Hamburger menu icon */
+    #hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 25px;
+      cursor: pointer;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    #hamburger div {
+      height: 4px;
+      background: #f58220;
+      border-radius: 2px;
+    }
+    /* Sidebar styles */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px; /* Hidden offscreen */
+      width: 250px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+      padding: 60px 20px 20px 20px;
+      box-sizing: border-box;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      border-right: 3px solid #f58220;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #sidebar.active {
+      left: 0;
+    }
+    #sidebar button {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #f58220;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: left;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+    }
+    #sidebar button:hover, #sidebar button.active {
+      background-color: #f58220;
+      color: white;
+    }
+    /* Content area shifted when sidebar active (optional) */
+    .container.shifted {
+      margin-left: 250px;
+      transition: margin-left 0.3s ease;
+    }
   </style>
 </head>
 <body>
+ <!-- Hamburger icon -->
+  <div id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <!-- Sidebar -->
+  <nav id="sidebar" aria-label="Main navigation">
+    <button id="prarthanaBtn" class="active">Prarthana Savings</button>
+    <button id="realityBtn">Reality Savings</button>
+  </nav>
+
   <div class="container">
     <div class="language-selector">
       <select class="language" onchange="changeLanguage(this.value)">
@@ -191,6 +264,45 @@
   </div>
 
   <script>
+
+ // Sidebar toggle
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const container = document.getElementById('mainContainer');
+
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      container.classList.toggle('shifted');
+    });
+
+    // Accessibility: toggle with Enter key on hamburger
+    hamburger.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        hamburger.click();
+      }
+    });
+
+    // Sidebar buttons for demo
+    const prarthanaBtn = document.getElementById('prarthanaBtn');
+    const realityBtn = document.getElementById('realityBtn');
+
+    prarthanaBtn.addEventListener('click', () => {
+      prarthanaBtn.classList.add('active');
+      realityBtn.classList.remove('active');
+      alert('Show Prarthana Savings form (to be implemented)');
+      // Hide sidebar on selection
+      sidebar.classList.remove('active');
+      container.classList.remove('shifted');
+    });
+
+    realityBtn.addEventListener('click', () => {
+      realityBtn.classList.add('active');
+      prarthanaBtn.classList.remove('active');
+      alert('Show Reality Savings form (to be implemented)');
+      sidebar.classList.remove('active');
+      container.classList.remove('shifted');
+    });
     const translations = {
       en: {
         title: "Prarthana Savings Calculator",
