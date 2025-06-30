@@ -170,6 +170,7 @@
   </style>
 </head>
 <body>
+ <body>
   <div id="hamburger" aria-label="Toggle menu" role="button" tabindex="0">
     <div></div><div></div><div></div>
   </div>
@@ -255,9 +256,12 @@
   </div>
 
   <script>
+
+  <script>
     const translations = {
       en: {
         title: "NSB Prarthana Savings Calculator",
+        realityTitle: "NSB Reality Savings Calculator",
         tab1: "🪙 Required Deposit",
         tab2: "💰 Maturity Value",
         labelOpeningDate: "Opening Date:",
@@ -270,7 +274,8 @@
         calculateMaturity: "Calculate Maturity"
       },
       si: {
-        title: "එන්එස්බී ප්‍රාර්ථනා ඉතිරිකිරීමේ ගණකය",
+        title: "NSB ප්‍රාර්ථනා ඉතිරිකිරීමේ ගණකය",
+        realityTitle: "NSB රියැලිටි ඉතිරිකිරීමේ ගණකය",
         tab1: "🪙 අවශ්‍ය තැන්පතුව",
         tab2: "💰 පිරවීමේ වටිනාකම",
         labelOpeningDate: "විවෘත කරන දිනය:",
@@ -284,6 +289,7 @@
       },
       ta: {
         title: "NSB ப்ரார்த்தனா சேமிப்பு கணிப்பான்",
+        realityTitle: "NSB ரியாலிட்டி சேமிப்பு கணிப்பான்",
         tab1: "🪙 தேவையான வைப்பு",
         tab2: "💰 வளர்ச்சி மதிப்பு",
         labelOpeningDate: "திறக்கும் தேதி:",
@@ -297,9 +303,13 @@
       }
     };
 
+    let currentLang = 'en';
+    let currentTab = 'prarthana';
+
     function changeLanguage(lang) {
+      currentLang = lang;
       const t = translations[lang];
-      document.getElementById("title").innerText = t.title;
+
       document.getElementById("tab1Btn").innerText = t.tab1;
       document.getElementById("tab2Btn").innerText = t.tab2;
 
@@ -316,73 +326,29 @@
       document.getElementById("labelDepositAmount").innerText = t.labelDepositAmount;
       document.getElementById("labelInterestRate2").innerText = t.labelInterestRate;
       document.getElementById("calculateMaturityBtn").innerText = t.calculateMaturity;
+
+      updateTitle();
     }
 
-    const hamburger = document.getElementById('hamburger');
-    const sidebar = document.getElementById('sidebar');
-    const container = document.getElementById('mainContainer');
-
-    hamburger.addEventListener('click', () => {
-      sidebar.classList.toggle('active');
-      container.classList.toggle('shifted');
-    });
+    function updateTitle() {
+      const t = translations[currentLang];
+      document.getElementById("title").innerText =
+        currentTab === 'prarthana' ? t.title : t.realityTitle;
+    }
 
     document.getElementById('prarthanaBtn').addEventListener('click', () => {
       document.getElementById('prarthanaBtn').classList.add('active');
       document.getElementById('realityBtn').classList.remove('active');
-      document.getElementById('title').innerText = translations.en.title;
-      sidebar.classList.remove('active');
-      container.classList.remove('shifted');
+      currentTab = 'prarthana';
+      updateTitle();
     });
 
     document.getElementById('realityBtn').addEventListener('click', () => {
       document.getElementById('realityBtn').classList.add('active');
       document.getElementById('prarthanaBtn').classList.remove('active');
-      document.getElementById('title').innerText = "NSB Reality Savings Calculator";
-      sidebar.classList.remove('active');
-      container.classList.remove('shifted');
+      currentTab = 'reality';
+      updateTitle();
     });
-
-    function showTab(tabId, element) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
-      element.classList.add("active");
-    }
-
-    function calculateMaturityDate(openingId, periodId, maturityId) {
-      const openingDate = new Date(document.getElementById(openingId).value);
-      const years = parseInt(document.getElementById(periodId).value);
-      if (!isNaN(openingDate) && years) {
-        openingDate.setFullYear(openingDate.getFullYear() + years);
-        document.getElementById(maturityId).value = openingDate.toISOString().split('T')[0];
-      } else {
-        document.getElementById(maturityId).value = "";
-      }
-    }
-
-    document.getElementById('period').addEventListener('change', () =>
-      calculateMaturityDate('openingDate', 'period', 'maturityDate'));
-    document.getElementById('period2').addEventListener('change', () =>
-      calculateMaturityDate('openingDate2', 'period2', 'maturityDate2'));
-
-    function calculateDeposit() {
-      const rate = parseFloat(document.getElementById("interestRate").value) / 100;
-      const years = parseInt(document.getElementById("period").value);
-      const expected = parseFloat(document.getElementById("expectedAmount").value);
-      if (isNaN(rate) || isNaN(years) || isNaN(expected)) return;
-      const deposit = expected / Math.pow(1 + rate, years);
-      document.getElementById("result").innerText = `Required Deposit: Rs. ${deposit.toFixed(2)}`;
-    }
-
-    function calculateMaturity() {
-      const rate = parseFloat(document.getElementById("interestRate2").value) / 100;
-      const years = parseInt(document.getElementById("period2").value);
-      const deposit = parseFloat(document.getElementById("depositAmount").value);
-      if (isNaN(rate) || isNaN(years) || isNaN(deposit)) return;
-      const maturity = deposit * Math.pow(1 + rate, years);
-      document.getElementById("result2").innerText = `Maturity Value: Rs. ${maturity.toFixed(2)}`;
-    }
   </script>
 </body>
 </html>
