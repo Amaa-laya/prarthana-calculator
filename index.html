@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NSB Prarthana Savings Calculator</title>
-   <style>
+  <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -158,79 +158,90 @@
 <body>
 
 <div class="hamburger" onclick="toggleSidebar()">☰</div>
+
 <div id="sidebar" class="sidebar">
   <a href="#prarthana">Prarthana</a>
   <a href="#reality">Reality</a>
 </div>
 
-<div class="container">
-  <div class="language-selector">
-    <select class="language" onchange="changeLanguage(this.value)">
-      <option value="en">English</option>
-      <option value="si">සිංහල</option>
-      <option value="ta">தமிழ்</option>
-    </select>
-  </div>
-  <h2 data-i18n="title">NSB Prarthana Savings Calculator</h2>
-  <div class="tabs">
-    <div class="tab active" onclick="showTab('tab1')" data-i18n="tab1">🪙 Required Deposit</div>
-    <div class="tab" onclick="showTab('tab2')" data-i18n="tab2">💰 Maturity Value</div>
-  </div>
-
-  <div id="tab1" class="tab-content active">
-    <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
-      <label for="openingDate" data-i18n="labelOpeningDate">Opening Date:</label>
-      <input type="date" id="openingDate" required />
-      <label for="period" data-i18n="labelPeriod">Maturity Period (Years):</label>
-      <select id="period" required>
-        <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
-        <option value="3">3 years</option>
-        <option value="5">5 years</option>
-        <option value="10">10 years</option>
-        <option value="15">15 years</option>
-        <option value="20">20 years</option>
+  <div class="container">
+    <div class="language-selector">
+      <select class="language" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="si">සිංහල</option>
+        <option value="ta">தமிழ்</option>
       </select>
-      <label for="maturityDate" data-i18n="labelMaturityDate">Maturity Date:</label>
-      <input type="date" id="maturityDate" disabled />
-      <label for="expectedAmount" data-i18n="labelExpectedAmount">Expected Maturity Amount (LKR):</label>
-      <input type="number" id="expectedAmount" required />
-      <label for="interestRate" data-i18n="labelInterestRate">Interest Rate (%):</label>
-      <input type="number" id="interestRate" step="0.01" required />
-      <button type="submit" data-i18n="calculate">Calculate Deposit</button>
-      <button type="button" onclick="printResult('tab1')" data-i18n="print">🖨️ Print</button>
-      <button type="button" onclick="saveToLocal('result')" data-i18n="save">💾 Save</button>
-    </form>
-    <div id="result"></div>
+    </div>
+    <h2 data-i18n="title">NSB Prarthana Savings Calculator</h2>
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('tab1')" data-i18n="tab1">🪙 Required Deposit</div>
+      <div class="tab" onclick="showTab('tab2')" data-i18n="tab2">💰 Maturity Value</div>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+      <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
+        <label for="openingDate" data-i18n="labelOpeningDate">Opening Date:</label>
+        <input type="date" id="openingDate" required />
+
+        <label for="period" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <select id="period" required>
+          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="3">3 years</option>
+          <option value="5">5 years</option>
+          <option value="10">10 years</option>
+          <option value="15">15 years</option>
+          <option value="20">20 years</option>
+        </select>
+
+        <label for="maturityDate" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <input type="date" id="maturityDate" disabled />
+
+        <label for="expectedAmount" data-i18n="labelExpectedAmount">Expected Maturity Amount (LKR):</label>
+        <input type="number" id="expectedAmount" placeholder="e.g. 100000" required />
+
+        <label for="interestRate" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <input type="number" id="interestRate" placeholder="e.g. 7.5" step="0.01" required />
+
+        <button type="submit" data-i18n="calculate">Calculate Deposit</button>
+        <button type="button" onclick="printResult('tab1')" data-i18n="print">🖨️ Print</button>
+        <button type="button" onclick="saveToLocal('result')" data-i18n="save">💾 Save</button>
+      </form>
+      <div id="result"></div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+      <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
+        <label for="openingDate2" data-i18n="labelOpeningDate">Opening Date:</label>
+        <input type="date" id="openingDate2" required />
+
+        <label for="period2" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <select id="period2" required>
+          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="3">3 years</option>
+          <option value="5">5 years</option>
+          <option value="10">10 years</option>
+          <option value="15">15 years</option>
+          <option value="20">20 years</option>
+        </select>
+
+        <label for="maturityDate2" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <input type="date" id="maturityDate2" disabled />
+
+        <label for="depositAmount" data-i18n="labelDepositAmount">Deposit Amount (LKR):</label>
+        <input type="number" id="depositAmount" placeholder="e.g. 50000" required />
+
+        <label for="interestRate2" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <input type="number" id="interestRate2" placeholder="e.g. 7.5" step="0.01" required />
+
+        <button type="submit" data-i18n="calculate">Calculate Maturity</button>
+        <button type="button" onclick="printResult('tab2')" data-i18n="print">🖨️ Print</button>
+        <button type="button" onclick="saveToLocal('result2')" data-i18n="save">💾 Save</button>
+      </form>
+      <div id="result2"></div>
+    </div>
   </div>
 
-  <div id="tab2" class="tab-content">
-    <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
-      <label for="openingDate2" data-i18n="labelOpeningDate">Opening Date:</label>
-      <input type="date" id="openingDate2" required />
-      <label for="period2" data-i18n="labelPeriod">Maturity Period (Years):</label>
-      <select id="period2" required>
-        <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
-        <option value="3">3 years</option>
-        <option value="5">5 years</option>
-        <option value="10">10 years</option>
-        <option value="15">15 years</option>
-        <option value="20">20 years</option>
-      </select>
-      <label for="maturityDate2" data-i18n="labelMaturityDate">Maturity Date:</label>
-      <input type="date" id="maturityDate2" disabled />
-      <label for="depositAmount" data-i18n="labelDepositAmount">Deposit Amount (LKR):</label>
-      <input type="number" id="depositAmount" required />
-      <label for="interestRate2" data-i18n="labelInterestRate">Interest Rate (%):</label>
-      <input type="number" id="interestRate2" step="0.01" required />
-      <button type="submit" data-i18n="calculate">Calculate Maturity</button>
-      <button type="button" onclick="printResult('tab2')" data-i18n="print">🖨️ Print</button>
-      <button type="button" onclick="saveToLocal('result2')" data-i18n="save">💾 Save</button>
-    </form>
-    <div id="result2"></div>
-  </div>
-</div>
-
-<script>
+  <script>
     const translations = {
       en: {
         title: "NSB Prarthana Savings Calculator",
@@ -414,12 +425,44 @@
               h3 { margin-top: 20px; color: #f58220; }
 
 function toggleSidebar() {
-const sidebar = document.getElementById('sidebar');
-sidebar.classList.toggle('open');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('open');
 }
 
-</style>
+            </style>
+          </head>
+          <body>${content}</body>
+        </html>`);
+      w.document.close();
+      w.focus();
+      w.print();
+      w.close();
+    }
 
+    function saveToLocal(resultId) {
+      const resultText = document.getElementById(resultId).innerText;
+      if (!resultText) {
+        alert(getCurrentAlert('alertCalculateFirst'));
+        return;
+      }
+      localStorage.setItem('prarthanaCalcResult', resultText);
+      alert(getCurrentAlert('alertSaved'));
+    }
+
+    function getCurrentAlert(key) {
+      const lang = document.querySelector('.language').value || 'en';
+      return translations[lang][key] || translations['en'][key];
+    }
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const lang = document.querySelector('.language').value || 'en';
+      let utterance = new SpeechSynthesisUtterance(text);
+      if (lang === 'si') utterance.lang = 'si-LK';
+      else if (lang === 'ta') utterance.lang = 'ta-IN';
+      else utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
 </body>
 </html>
-
