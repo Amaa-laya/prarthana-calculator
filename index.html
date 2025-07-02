@@ -7,21 +7,18 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
+      margin: 0; padding: 20px;
       background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       color: black;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
     }
     .container {
       background: #fff;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
+      max-width: 850px;
       width: 100%;
     }
     h2 {
@@ -74,7 +71,6 @@
       display: block;
       margin-bottom: 6px;
       font-weight: 600;
-      color: black;
       font-size: 14px;
     }
     input, select {
@@ -152,92 +148,149 @@
   </style>
 </head>
 <body>
-<div class="hamburger" onclick="toggleSidebar()">☰</div>
-<div id="sidebar" class="sidebar">
-  <a href="#" onclick="switchToTab('tab1', this)">Prarthana</a>
-  <a href="#" onclick="switchToTab('tab2', this)">Reality</a>
-</div>
-<div class="container">
-  <div class="language-selector">
-    <select class="language" onchange="changeLanguage(this.value)">
-      <option value="en">English</option>
-      <option value="si">සිංහල</option>
-      <option value="ta">தமிழ்</option>
-    </select>
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+  <div id="sidebar" class="sidebar">
+    <a href="#" onclick="switchToTab('tab1', this)">Prarthana</a>
+    <a href="#" onclick="switchToTab('tab2', this)">Reality</a>
   </div>
-  <h2 data-i18n="title">NSB Prarthana Savings Calculator</h2>
-  <div class="tabs">
-    <div class="tab active" onclick="showTab(event, 'tab1')" data-i18n="tab1">🪙 Required Deposit</div>
-    <div class="tab" onclick="showTab(event, 'tab2')" data-i18n="tab2">💰 Maturity Value</div>
+  <div class="container">
+    <div class="language-selector">
+      <select class="language" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="si">සිංහල</option>
+        <option value="ta">தமிழ்</option>
+      </select>
+    </div>
+    <h2 data-i18n="title">NSB Prarthana Savings Calculator</h2>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab(event, 'tab1')" data-i18n="tab1">🪙 Required Deposit</div>
+      <div class="tab" onclick="showTab(event, 'tab2')" data-i18n="tab2">💰 Maturity Value</div>
+    </div>
+
+    <!-- Tab 1 Form -->
+    <div id="tab1" class="tab-content active">
+      <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
+        <label for="openingDate" data-i18n="labelOpeningDate">Opening Date:</label>
+        <input type="date" id="openingDate" required onchange="updateMaturityDate('openingDate','period','maturityDate')" />
+
+        <label for="period" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <select id="period" required onchange="updateMaturityDate('openingDate','period','maturityDate')">
+          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="3">3 years</option>
+          <option value="5">5 years</option>
+          <option value="10">10 years</option>
+          <option value="15">15 years</option>
+          <option value="20">20 years</option>
+        </select>
+
+        <label for="maturityDate" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <input type="date" id="maturityDate" disabled />
+
+        <label for="expectedAmount" data-i18n="labelExpectedAmount">Expected Maturity Amount (LKR):</label>
+        <input type="number" id="expectedAmount" placeholder="e.g. 100000" required min="1" />
+
+        <label for="interestRate" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <input type="number" id="interestRate" placeholder="e.g. 7.5" step="0.01" required min="0" />
+
+        <button type="submit" data-i18n="calculate">Calculate Deposit</button>
+        <button type="button" onclick="printResult('tab1')" data-i18n="print">🖨️ Print</button>
+        <button type="button" onclick="saveToLocal('result')" data-i18n="save">💾 Save</button>
+      </form>
+      <div id="result"></div>
+    </div>
+
+    <!-- Tab 2 Form -->
+    <div id="tab2" class="tab-content">
+      <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
+        <label for="openingDate2" data-i18n="labelOpeningDate">Opening Date:</label>
+        <input type="date" id="openingDate2" required onchange="updateMaturityDate('openingDate2','period2','maturityDate2')" />
+
+        <label for="period2" data-i18n="labelPeriod">Maturity Period (Years):</label>
+        <select id="period2" required onchange="updateMaturityDate('openingDate2','period2','maturityDate2')">
+          <option value="" disabled selected data-i18n="selectMaturityPeriod">Select Maturity Period</option>
+          <option value="3">3 years</option>
+          <option value="5">5 years</option>
+          <option value="10">10 years</option>
+          <option value="15">15 years</option>
+          <option value="20">20 years</option>
+        </select>
+
+        <label for="maturityDate2" data-i18n="labelMaturityDate">Maturity Date:</label>
+        <input type="date" id="maturityDate2" disabled />
+
+        <label for="depositAmount" data-i18n="labelDepositAmount">Deposit Amount (LKR):</label>
+        <input type="number" id="depositAmount" placeholder="e.g. 50000" required min="1" />
+
+        <label for="interestRate2" data-i18n="labelInterestRate">Interest Rate (%):</label>
+        <input type="number" id="interestRate2" placeholder="e.g. 7.5" step="0.01" required min="0" />
+
+        <button type="submit" data-i18n="calculate">Calculate Maturity</button>
+        <button type="button" onclick="printResult('tab2')" data-i18n="print">🖨️ Print</button>
+        <button type="button" onclick="saveToLocal('result2')" data-i18n="save">💾 Save</button>
+      </form>
+      <div id="result2"></div>
+    </div>
   </div>
-  <div id="tab1" class="tab-content active">
-    <form id="form1" onsubmit="calculateDeposit(event)">
-      <label for="targetAmount" data-i18n="targetAmountLabel">Target Amount (Rs):</label>
-      <input type="number" id="targetAmount" required min="1" />
 
-      <label for="years" data-i18n="yearsLabel">Years:</label>
-      <input type="number" id="years" required min="1" />
-
-      <label for="rate" data-i18n="rateLabel">Annual Interest Rate (%):</label>
-      <input type="number" id="rate" required min="0" step="0.01" />
-
-      <button type="submit" data-i18n="calculateBtn">Calculate</button>
-    </form>
-    <div id="result"></div>
-  </div>
-  <div id="tab2" class="tab-content">
-    <form id="form2" onsubmit="calculateMaturity(event)">
-      <label for="monthlyDeposit" data-i18n="monthlyDepositLabel">Monthly Deposit (Rs):</label>
-      <input type="number" id="monthlyDeposit" required min="1" />
-
-      <label for="years2" data-i18n="yearsLabel">Years:</label>
-      <input type="number" id="years2" required min="1" />
-
-      <label for="rate2" data-i18n="rateLabel">Annual Interest Rate (%):</label>
-      <input type="number" id="rate2" required min="0" step="0.01" />
-
-      <button type="submit" data-i18n="calculateBtn">Calculate</button>
-    </form>
-    <div id="result2"></div>
-  </div>
-</div>
 <script>
+  // Language translations
   const translations = {
     en: {
       title: "NSB Prarthana Savings Calculator",
       tab1: "🪙 Required Deposit",
       tab2: "💰 Maturity Value",
-      targetAmountLabel: "Target Amount (Rs):",
-      yearsLabel: "Years:",
-      rateLabel: "Annual Interest Rate (%):",
-      calculateBtn: "Calculate",
-      monthlyDepositLabel: "Monthly Deposit (Rs):"
+      labelOpeningDate: "Opening Date:",
+      labelPeriod: "Maturity Period (Years):",
+      selectMaturityPeriod: "Select Maturity Period",
+      labelMaturityDate: "Maturity Date:",
+      labelExpectedAmount: "Expected Maturity Amount (LKR):",
+      labelInterestRate: "Interest Rate (%):",
+      calculate: "Calculate",
+      print: "🖨️ Print",
+      save: "💾 Save",
+      labelDepositAmount: "Deposit Amount (LKR):",
+      calculateDepositBtn: "Calculate Deposit",
+      calculateMaturityBtn: "Calculate Maturity"
     },
     si: {
       title: "එන්එස්බී ප්‍රාර්ථනා ඉතුරුම් ගණකය",
       tab1: "🪙 අවශ්‍ය තැන්පතුව",
       tab2: "💰 පැමිණෙන අගය",
-      targetAmountLabel: "ඉලක්ක මුදල (රු):",
-      yearsLabel: "වසර:",
-      rateLabel: "වාර්ෂික පොලී අනුපාතය (%):",
-      calculateBtn: "ගණනය කරන්න",
-      monthlyDepositLabel: "මාසික තැන්පතුව (රු):"
+      labelOpeningDate: "ආරම්භක දිනය:",
+      labelPeriod: "ප්‍රමාද කාලය (වසර):",
+      selectMaturityPeriod: "ප්‍රමාද කාලය තෝරන්න",
+      labelMaturityDate: "පැමිණෙන දිනය:",
+      labelExpectedAmount: "अपේක්ෂිත පැමිණෙන මුදල (රු):",
+      labelInterestRate: "වට්ටම් අනුපාතය (%):",
+      calculate: "ගණනය කරන්න",
+      print: "🖨️ මුද්‍රණය කරන්න",
+      save: "💾 සුරකින්න",
+      labelDepositAmount: "තැන්පතු මුදල (රු):",
+      calculateDepositBtn: "තැන්පතු ගණනය කරන්න",
+      calculateMaturityBtn: "පැමිණෙන මුදල ගණනය කරන්න"
     },
     ta: {
-      title: "NSB பிரார்த்தனை சேமிப்பு கணிப்பான்",
+      title: "என்எஸ்பி பிரார்த்தனா சேமிப்பு கணக்கீடு",
       tab1: "🪙 தேவையான வைப்பு",
-      tab2: "💰 முடிவிலான மதிப்பு",
-      targetAmountLabel: "இலக்கு தொகை (ரூ):",
-      yearsLabel: "ஆண்டுகள்:",
-      rateLabel: "வருடாந்திர வட்டி விகிதம் (%):",
-      calculateBtn: "கணக்கிடு",
-      monthlyDepositLabel: "மாதாந்திர வைப்பு (ரூ):"
+      tab2: "💰 பருவமுடிவு மதிப்பு",
+      labelOpeningDate: "தொடக்க தேதி:",
+      labelPeriod: "காலம் (ஆண்டுகள்):",
+      selectMaturityPeriod: "காலம் தேர்வு செய்க",
+      labelMaturityDate: "பருவமுடிவு தேதி:",
+      labelExpectedAmount: "எதிர்பார்க்கும் பருவமுடிவு தொகை (LKR):",
+      labelInterestRate: "வட்டிக் கதிர் (%):",
+      calculate: "கணக்கிடு",
+      print: "🖨️ அச்சிடு",
+      save: "💾 சேமி",
+      labelDepositAmount: "வைப்பு தொகை (LKR):",
+      calculateDepositBtn: "வைப்பு கணக்கிடு",
+      calculateMaturityBtn: "பருவமுடிவு கணக்கிடு"
     }
   };
 
   function changeLanguage(lang) {
-    const elements = document.querySelectorAll('[data-i18n]');
-    elements.forEach(el => {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (translations[lang] && translations[lang][key]) {
         el.textContent = translations[lang][key];
@@ -245,74 +298,143 @@
     });
   }
 
-  function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("open");
+  // Initialize language to English
+  changeLanguage('en');
+
+  // Tabs switching
+  function showTab(evt, tabId) {
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+    evt.currentTarget.classList.add('active');
   }
 
-  function showTab(event, tabId) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  // Sidebar toggle
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  // Sidebar tab switch (also update tab highlights)
+  function switchToTab(tabId, link) {
+    toggleSidebar();
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    if (event && event.currentTarget) {
-      event.currentTarget.classList.add('active');
+
+    // Update tab highlight by matching tab text
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.textContent.trim().startsWith(link.textContent.trim().slice(2))) {
+        t.classList.add('active');
+      }
+    });
+  }
+
+  // Update maturity date based on opening date + period
+  function updateMaturityDate(openingId, periodId, maturityId) {
+    const openingDate = document.getElementById(openingId).value;
+    const periodYears = parseInt(document.getElementById(periodId).value);
+    const maturityInput = document.getElementById(maturityId);
+
+    if (openingDate && !isNaN(periodYears)) {
+      const opening = new Date(openingDate);
+      const maturity = new Date(opening);
+      maturity.setFullYear(maturity.getFullYear() + periodYears);
+
+      // Format YYYY-MM-DD
+      const yyyy = maturity.getFullYear();
+      const mm = String(maturity.getMonth() + 1).padStart(2, '0');
+      const dd = String(maturity.getDate()).padStart(2, '0');
+      maturityInput.value = `${yyyy}-${mm}-${dd}`;
+    } else {
+      maturityInput.value = '';
     }
   }
 
-  function switchToTab(tabId, linkElement) {
-    showTab(null, tabId);
-    const tabIndex = tabId === 'tab1' ? 0 : 1;
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(t => t.classList.remove('active'));
-    tabs[tabIndex].classList.add('active');
-  }
+  // Calculation functions
+  function calculateDeposit() {
+    // Get values from form 1
+    const expectedAmount = parseFloat(document.getElementById('expectedAmount').value);
+    const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+    const period = parseInt(document.getElementById('period').value);
 
-  function calculateDeposit(event) {
-    event.preventDefault();
-    const target = parseFloat(document.getElementById("targetAmount").value);
-    const years = parseFloat(document.getElementById("years").value);
-    const rate = parseFloat(document.getElementById("rate").value);
-
-    if (isNaN(target) || isNaN(years) || isNaN(rate) || target <= 0 || years <= 0 || rate < 0) {
-      document.getElementById("result").textContent = "Please enter valid values.";
+    if (isNaN(expectedAmount) || isNaN(interestRate) || isNaN(period)) {
+      alert("Please enter valid numbers.");
       return;
     }
 
-    const r = rate / 100;
-    const n = 12; // monthly compounding
-    const t = years;
+    // Compound interest formula rearranged to find principal (deposit):
+    // A = P (1 + r)^t => P = A / (1 + r)^t
+    const deposit = expectedAmount / Math.pow(1 + interestRate, period);
 
-    // Calculate present value needed (required monthly deposit)
-    // Formula rearranged from FV of annuity:
-    // PMT = FV / (((1 + r/n)^(nt) -1) / (r/n))
-    const monthlyRate = r / n;
-    const denominator = (Math.pow(1 + monthlyRate, n * t) - 1) / monthlyRate;
-    const deposit = target / denominator;
-
-    document.getElementById("result").textContent = `Required Monthly Deposit: Rs. ${deposit.toFixed(2)}`;
+    const resultDiv = document.getElementById('result');
+    resultDiv.textContent = `Required Deposit Amount: LKR ${deposit.toFixed(2)}`;
   }
 
-  function calculateMaturity(event) {
-    event.preventDefault();
-    const monthlyDeposit = parseFloat(document.getElementById("monthlyDeposit").value);
-    const years = parseFloat(document.getElementById("years2").value);
-    const rate = parseFloat(document.getElementById("rate2").value);
+  function calculateMaturity() {
+    // Get values from form 2
+    const depositAmount = parseFloat(document.getElementById('depositAmount').value);
+    const interestRate = parseFloat(document.getElementById('interestRate2').value) / 100;
+    const period = parseInt(document.getElementById('period2').value);
 
-    if (isNaN(monthlyDeposit) || isNaN(years) || isNaN(rate) || monthlyDeposit <= 0 || years <= 0 || rate < 0) {
-      document.getElementById("result2").textContent = "Please enter valid values.";
+    if (isNaN(depositAmount) || isNaN(interestRate) || isNaN(period)) {
+      alert("Please enter valid numbers.");
       return;
     }
 
-    const r = rate / 100;
-    const n = 12; // monthly compounding
-    const t = years;
+    // Compound interest formula:
+    // A = P (1 + r)^t
+    const maturityAmount = depositAmount * Math.pow(1 + interestRate, period);
 
-    // Calculate maturity value (future value of annuity)
-    // FV = PMT * [((1 + r/n)^(nt) -1) / (r/n)]
-    const monthlyRate = r / n;
-    const maturity = monthlyDeposit * ((Math.pow(1 + monthlyRate, n * t) - 1) / monthlyRate);
-
-    document.getElementById("result2").textContent = `Maturity Value: Rs. ${maturity.toFixed(2)}`;
+    const resultDiv = document.getElementById('result2');
+    resultDiv.textContent = `Expected Maturity Amount: LKR ${maturityAmount.toFixed(2)}`;
   }
+
+  // Print result function
+  function printResult(tabId) {
+    let content = '';
+    if (tabId === 'tab1') {
+      content = document.getElementById('result').textContent;
+    } else if (tabId === 'tab2') {
+      content = document.getElementById('result2').textContent;
+    }
+    if (!content) {
+      alert("Nothing to print yet!");
+      return;
+    }
+    const printWindow = window.open('', '', 'width=600,height=400');
+    printWindow.document.write('<pre>' + content + '</pre>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }
+
+  // Save result to localStorage
+  function saveToLocal(resultId) {
+    let content = '';
+    if (resultId === 'result') {
+      content = document.getElementById('result').textContent;
+    } else if (resultId === 'result2') {
+      content = document.getElementById('result2').textContent;
+    }
+    if (!content) {
+      alert("Nothing to save yet!");
+      return;
+    }
+    localStorage.setItem(resultId, content);
+    alert("Saved successfully!");
+  }
+
+  // Optionally, you can load saved results on page load
+  window.onload = function() {
+    if(localStorage.getItem('result')) {
+      document.getElementById('result').textContent = localStorage.getItem('result');
+    }
+    if(localStorage.getItem('result2')) {
+      document.getElementById('result2').textContent = localStorage.getItem('result2');
+    }
+  };
 </script>
 </body>
 </html>
