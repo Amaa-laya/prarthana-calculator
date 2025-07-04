@@ -119,7 +119,7 @@
       color: #1976d2;
       font-weight: bold;
       white-space: pre-wrap;
-      min-height: 60px;
+      min-height: 80px;
     }
     #maturityDate,
     #maturityDate2 {
@@ -187,12 +187,13 @@
     </div>
     <h2 id="main-title">NSB Prarthana Savings Calculator</h2>
     <div class="tabs">
-      <div class="tab active" onclick="switchToTab('tab1')">🪙 Required Deposit</div>
-      <div class="tab" onclick="switchToTab('tab2')">💰 Maturity Value</div>
+      <div class="tab active" onclick="switchToTab('tab1')">🪙 Required Deposit (Prarthana)</div>
+      <div class="tab" onclick="switchToTab('tab2')">💰 Reality Savings</div>
     </div>
 
+    <!-- Prarthana Tab -->
     <div id="tab1" class="tab-content active">
-      <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
+      <form id="form1" onsubmit="event.preventDefault(); calculatePrarthana();">
         <label for="openingDate">Opening Date:</label>
         <input type="date" id="openingDate" required />
         <label for="expectedAmount">Expected Maturity Amount (LKR):</label>
@@ -218,8 +219,9 @@
       <div id="maturityDate"></div>
     </div>
 
+    <!-- Reality Tab -->
     <div id="tab2" class="tab-content">
-      <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
+      <form id="form2" onsubmit="event.preventDefault(); calculateReality();">
         <label for="openingDate2">Opening Date:</label>
         <input type="date" id="openingDate2" required />
         <label for="monthlyInstallment">Monthly Installment (LKR):</label>
@@ -247,13 +249,13 @@
   </div>
 
   <script>
-    // Translations
+    // Translations for labels etc.
     const translations = {
       en: {
         prarthana: "NSB Prarthana Savings Calculator",
         reality: "NSB Reality Savings Calculator",
         instruction1: "Enter your opening date, expected maturity amount, interest rate, and period.",
-        instruction2: "Enter your opening date, monthly deposit, interest rate, and period.",
+        instruction2: "Enter your opening date, monthly installment, interest rate, and period.",
         openingDate: "Opening Date:",
         expectedAmount: "Expected Maturity Amount (LKR):",
         interestRate: "Interest Rate (% annual):",
@@ -324,27 +326,14 @@
       document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      document.querySelectorAll('.tab').forEach(tab => {
-        if(tab.textContent.toLowerCase().includes(tabId === 'tab1' ? 'required' : 'maturity')){
-          tab.classList.add('active');
-        }
-      });
-      // Better approach:
-      const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => {
-        tab.classList.remove('active');
-      });
-      if(tabId === 'tab1') tabs[0].classList.add('active');
-      else tabs[1].classList.add('active');
-
+      if(tabId === 'tab1') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+      }
       updateLanguageText();
       speakInstruction();
       closeSidebar();
-    }
-
-    // Show tab from click event
-    function showTab(event, tabId) {
-      switchToTab(tabId);
     }
 
     // Get selected language
@@ -352,8 +341,9 @@
       return document.getElementById("language").value || "en";
     }
 
-    // Calculate for Required Deposit (Prarthana)
-    function calculateDeposit() {
+    // Calculate Prarthana Required Deposit
+    // Lump sum deposit today to get maturity amount A after t years with yearly compound interest r
+    function calculatePrarthana() {
       const openingDateStr = document.getElementById("openingDate").value;
       const A = parseFloat(document.getElementById("expectedAmount").value);
       const r = parseFloat(document.getElementById("interestRate").value) / 100;
@@ -369,9 +359,9 @@
       }
 
       // Present Value formula: P = A / (1 + r)^t
-      let P = A / Math.pow(1 + r, t);
+      const P = A / Math.pow(1 + r, t);
 
-      // Format dates
+      // Maturity date = opening date + t years
       const openingDate = new Date(openingDateStr);
       const maturityDate = new Date(openingDate);
       maturityDate.setFullYear(maturityDate.getFullYear() + t);
@@ -380,15 +370,15 @@
       const trans = translations[lang];
 
       const result = `${trans.expectedAmount} ${A.toFixed(2)}\n${trans.interestRate} ${(r*100).toFixed(2)}%\n${trans.period} ${t} ${lang === 'si' ? 'වසර' : lang === 'ta' ? 'ஆண்டு' : 'years'}\n\n` +
-                     (lang === 'si' ? 'අද තැන්පතු:' : lang === 'ta' ? 'இன்று வைப்பு:' : 'Deposit today:') + ` LKR ${P.toFixed(2)}`;
+                     (lang === 'si' ? 'අද ලග්න තැන්පතු:' : lang === 'ta' ? 'இன்று தொகுப்பீடு:' : 'Deposit today:') + ` LKR ${P.toFixed(2)}`;
 
       document.getElementById("result").textContent = result;
       document.getElementById("maturityDate").textContent = `${trans.maturityDateLabel} ${maturityDate.toLocaleDateString()}`;
       speakText(result);
     }
 
-    // Calculate for Maturity Value (Reality)
-    function calculateMaturity() {
+    // Calculate Reality Maturity Value and Required Deposit for lump sum equivalent
+    function calculateReality() {
       const openingDateStr = document.getElementById("openingDate2").value;
       const monthly = parseFloat(document.getElementById("monthlyInstallment").value);
       const r = parseFloat(document.getElementById("interestRate2").value) / 100;
@@ -403,13 +393,20 @@
         return;
       }
 
+      // Monthly interest rate
       const monthlyRate = r / 12;
+
+      // Calculate maturity value of monthly deposits with monthly compounding
       let total = 0;
       for (let i = 0; i < months; i++) {
         total = (total + monthly) * (1 + monthlyRate);
       }
 
-      // Format dates
+      // Now calculate equivalent lump sum deposit today (present value) to get total after months
+      // Using formula: PV = total / (1 + monthlyRate)^months
+      const lumpSum = total / Math.pow(1 + monthlyRate, months);
+
+      // Maturity date = opening date + months
       const openingDate = new Date(openingDateStr);
       const maturityDate = new Date(openingDate);
       maturityDate.setMonth(maturityDate.getMonth() + months);
@@ -418,74 +415,76 @@
       const trans = translations[lang];
 
       const result = `${trans.monthlyInstallment} ${monthly.toFixed(2)}\n${trans.interestRate2} ${(r*100).toFixed(2)}%\n${trans.months} ${months}\n\n` +
-                     (lang === 'si' ? 'කල් ඉකුත් වීමට:' : lang === 'ta' ? 'காலாவதியாகும் தேதி:' : 'Maturity Value:') + ` LKR ${total.toFixed(2)}`;
+                     (lang === 'si' ? 'කල් ඉකුත් වීමට:' : lang === 'ta' ? 'காலாவதியாகும் தேதி:' : 'Maturity Value:') + ` LKR ${total.toFixed(2)}\n` +
+                     (lang === 'si' ? 'සමම පිරිවැය (ලග්න තැන්පතු):' : lang === 'ta' ? 'மொத்த வைப்பு:' : 'Equivalent Lump Sum Deposit:') + ` LKR ${lumpSum.toFixed(2)}`;
 
       document.getElementById("result2").textContent = result;
       document.getElementById("maturityDate2").textContent = `${trans.maturityDateLabel} ${maturityDate.toLocaleDateString()}`;
       speakText(result);
     }
 
-    // Clear form inputs and result display
+    // Clear form and result
     function clearForm(formId, resultId, maturityDateId) {
       document.getElementById(formId).reset();
       document.getElementById(resultId).textContent = "";
-      if (maturityDateId) {
+      if(maturityDateId) {
         document.getElementById(maturityDateId).textContent = "";
       }
     }
 
-    // Print the result text in a new window
+    // Print result
     function printResult(resultId) {
       const content = document.getElementById(resultId).textContent;
-      if (!content) return alert("Nothing to print!");
+      if(!content) return alert("Nothing to print!");
       const win = window.open('', '_blank');
       win.document.write(`<pre style="font-family:Arial, sans-serif; font-size:16px;">${content}</pre>`);
       win.document.close();
       win.print();
     }
 
-    // Email result using mailto with subject & body
+    // Email result via mailto
     function emailResult(resultId) {
       const content = document.getElementById(resultId).textContent;
-      if (!content) return alert("Nothing to email!");
+      if(!content) return alert("Nothing to email!");
       const subject = encodeURIComponent("NSB Savings Calculator Result");
       const body = encodeURIComponent(content);
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
 
-    // Change language and update UI
+    // Language change
     function changeLanguage(lang) {
       updateLanguageText();
       speakInstruction();
     }
 
-    // Update all texts based on selected language
+    // Update UI text according to language
     function updateLanguageText() {
       const lang = getSelectedLang();
       const trans = translations[lang];
 
-      // Update main title
+      // Main title & tabs
       const tab1Active = document.getElementById("tab1").classList.contains("active");
       document.getElementById("main-title").textContent = tab1Active ? trans.prarthana : trans.reality;
 
-      // Tab1 labels
-      if (tab1Active) {
+      // Labels and buttons for Prarthana tab
+      if(tab1Active) {
         document.querySelector('label[for="openingDate"]').textContent = trans.openingDate;
         document.querySelector('label[for="expectedAmount"]').textContent = trans.expectedAmount;
         document.querySelector('label[for="interestRate"]').textContent = trans.interestRate;
         document.querySelector('label[for="period"]').textContent = trans.period;
+
         const buttons = document.querySelectorAll('#tab1 button');
         buttons[0].textContent = trans.buttons.calculate;
         buttons[1].textContent = trans.buttons.clear;
         buttons[2].textContent = trans.buttons.print;
         buttons[3].textContent = trans.buttons.email;
-      }
-      // Tab2 labels
-      else {
+      } else {
+        // Labels and buttons for Reality tab
         document.querySelector('label[for="openingDate2"]').textContent = trans.openingDate;
         document.querySelector('label[for="monthlyInstallment"]').textContent = trans.monthlyInstallment;
         document.querySelector('label[for="interestRate2"]').textContent = trans.interestRate2;
         document.querySelector('label[for="months"]').textContent = trans.months;
+
         const buttons = document.querySelectorAll('#tab2 button');
         buttons[0].textContent = trans.buttons.calculate;
         buttons[1].textContent = trans.buttons.clear;
@@ -494,21 +493,25 @@
       }
     }
 
-    // Speak instructions for current tab
+    // Speak instruction on tab load or language change
     function speakInstruction() {
       if (!('speechSynthesis' in window)) return;
-      const msg = new SpeechSynthesisUtterance();
       const lang = getSelectedLang();
-      msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
+      const trans = translations[lang];
       const tab1Active = document.getElementById("tab1").classList.contains("active");
-      msg.text = tab1Active ? translations[lang].instruction1 : translations[lang].instruction2;
+
+      const msg = new SpeechSynthesisUtterance();
+      msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
+      msg.text = tab1Active ? trans.instruction1 : trans.instruction2;
+
       speechSynthesis.cancel();
       speechSynthesis.speak(msg);
     }
 
-    // Speak arbitrary text
+    // Speak result text
     function speakText(text) {
-      if (!text || !('speechSynthesis' in window)) return;
+      if (!('speechSynthesis' in window)) return;
+      if(!text) return;
       const lang = getSelectedLang();
       const msg = new SpeechSynthesisUtterance(text);
       msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
@@ -516,12 +519,11 @@
       speechSynthesis.speak(msg);
     }
 
-    // Initialize on page load
+    // On load
     window.onload = () => {
       updateLanguageText();
       speakInstruction();
-    };
+    }
   </script>
 </body>
 </html>
-
