@@ -5,216 +5,137 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>NSB Savings Calculator</title>
 <style>
-/* === BASIC LAYOUT === */
-body{font-family:Arial,sans-serif;margin:0;background:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
-.container{background:#fff;padding:30px;border-radius:15px;box-shadow:0 4px 20px rgba(0,0,0,.1);max-width:940px;width:100%}
-h2{text-align:center;color:#f58220;margin:0 0 20px}
+/* === LAYOUT & COLORS === */
+:root{--nsb:#f58220;--grey:#e0e0e0}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.container{background:#fff;padding:28px 26px;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.1);max-width:960px;width:100%}
+h2{margin:0 0 22px;text-align:center;color:var(--nsb)}
 /* === SIDEBAR === */
-.hamburger{position:fixed;top:18px;left:18px;font-size:30px;cursor:pointer;background:#fff;border-radius:8px;padding:5px 12px;
-          color:#f58220;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:1100;user-select:none}
-.sidebar{position:fixed;left:-260px;top:0;width:260px;height:100%;background:#f58220;padding-top:60px;transition:.3s;z-index:1000}
+.hamburger{position:fixed;top:18px;left:18px;background:#fff;color:var(--nsb);font-size:28px;padding:6px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;z-index:1100;user-select:none}
+.sidebar{position:fixed;left:-260px;top:0;width:260px;height:100%;background:var(--nsb);padding-top:60px;transition:.3s ease;z-index:1000}
 .sidebar.open{left:0}
 .sidebar a{display:block;padding:16px 24px;color:#fff;text-decoration:none;font-weight:bold}
 .sidebar a:hover{background:#e06d0f}
-/* === TABS === */
+/* === HEADER LANGUAGE === */
+.lang{display:flex;justify-content:flex-end;margin-bottom:10px}
+.lang select{padding:6px 10px;border-radius:6px;border:1px solid #ccc;font-size:15px}
+/* === PRODUCT TABS === */
 .tabs{display:flex;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-.tab{padding:10px 22px;margin:5px;background:#e0e0e0;border-radius:8px;cursor:pointer;user-select:none;white-space:nowrap}
-.tab.active{background:#f58220;color:#fff}
+.tab{background:var(--grey);padding:10px 22px;margin:4px;border-radius:8px;cursor:pointer;white-space:nowrap;user-select:none;transition:.3s}
+.tab.active{background:var(--nsb);color:#fff}
+/* === INNER CONTENT === */
 .tab-content{display:none}
 .tab-content.active{display:block}
-/* === FORM & INPUTS === */
-form{border:2px solid #f58220;padding:20px;border-radius:12px}
-label{display:block;font-weight:600;margin-bottom:6px}
-input,select{width:100%;padding:10px;margin-bottom:15px;border:2px solid #f58220;border-radius:8px;font-size:16px}
-button{background:#f58220;color:#fff;border:none;border-radius:5px;padding:10px 14px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+form{border:2px solid var(--nsb);padding:20px;border-radius:12px}
+/* grid */
+.form-grid{display:grid;grid-template-columns:1fr 2fr;gap:12px 20px;align-items:center}
+.form-grid-full{grid-column:1/-1;text-align:left}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+label{font-weight:600}
+input,select{width:100%;padding:10px;border:2px solid var(--nsb);border-radius:8px;font-size:15px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+button{background:var(--nsb);color:#fff;border:none;border-radius:5px;padding:9px 14px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 button:hover{background:#e06d0f}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:5px}
-.result{margin-top:18px;font-size:18px;font-weight:bold;color:#1976d2;white-space:pre-wrap;min-height:60px}
-.maturity-label{font-size:15px;font-weight:600;color:#444;margin-top:6px}
-/* === LANGUAGE SELECT === */
-.lang{display:flex;justify-content:flex-end;margin-bottom:8px}
-.lang select{padding:6px 10px;border-radius:5px}
-@media(max-width:640px){.tabs .tab{flex:1 1 45%}}
+.result{margin-top:18px;min-height:60px;font-size:17px;font-weight:bold;color:#1976d2;white-space:pre-wrap}
 </style>
 </head>
 <body>
 <span class="hamburger" onclick="toggleSidebar()">☰</span>
-<nav id="sidebar" class="sidebar">
-  <a href="#" onclick="switchProduct('prarthana');closeSidebar()">Prarthana</a>
-  <a href="#" onclick="switchProduct('reality');closeSidebar()">Reality</a>
+<nav id="side" class="sidebar">
+ <a href="#" onclick="setProduct('prarthana');closeSidebar()">Prarthana</a>
+ <a href="#" onclick="setProduct('reality');closeSidebar()">Reality</a>
 </nav>
-
 <div class="container">
-  <div class="lang"><select id="langSel" onchange="applyLang()">
-      <option value="en">English</option><option value="si">සිංහල</option><option value="ta">தமிழ்</option></select></div>
+  <div class="lang"><select id="lang" onchange="applyLang()"><option value="en">English</option><option value="si">සිංහල</option><option value="ta">தமிழ்</option></select></div>
   <h2 id="title">NSB Prarthana Savings Calculator</h2>
-
-  <!-- inner tabs -->
   <div class="tabs">
-    <div class="tab active" id="tabReqBtn"   onclick="showTab('req')">🪙 <span id="txtReq">Required Deposit</span></div>
-    <div class="tab"         id="tabMatBtn"   onclick="showTab('mat')">💰 <span id="txtMat">Maturity Value</span></div>
+    <div id="tabReqBtn" class="tab active" onclick="showTab('req')">🪙 <span id="txtReq">Required Deposit</span></div>
+    <div id="tabMatBtn" class="tab" onclick="showTab('mat')">💰 <span id="txtMat">Maturity Value</span></div>
   </div>
-
-  <!-- Required Deposit -->
-  <div class="tab-content active" id="req">
-    <form id="formReq" onsubmit="event.preventDefault();calcRequired()">
-      <label id="lblOpen"  for="open">Opening Date:</label>
-      <input id="open" type="date" required>
-      <label id="lblPer"   for="per">Period:</label>
-      <select id="per" required></select>
-      <label id="lblMatDate" for="mdate">Maturity Date:</label>
-      <input id="mdate" type="date" disabled>
-      <label id="lblTarget" for="target">Target Amount (LKR):</label>
-      <input id="target" type="number" min="0" step="0.01" required>
-      <label id="lblRate" for="rate">Interest Rate (%/yr):</label>
-      <input id="rate" type="number" min="0" step="0.01" required>
-      <div class="btns">
-        <button>🧮 <span id="btnCalc1">Calculate</span></button>
-        <button type="button" onclick="clearAll()">🧹 <span id="btnClr1">Clear</span></button>
-        <button type="button" onclick="printRes('res1')">🖨️ <span id="btnPrt1">Print</span></button>
-        <button type="button" onclick="mailRes('res1')">📧 <span id="btnMail1">Email</span></button>
+  <!-- Required -->
+  <div id="req" class="tab-content active">
+    <form id="formReq" onsubmit="event.preventDefault();calcReq()">
+      <div class="form-grid">
+        <label id="lblOpen" for="open">Opening Date:</label>
+        <input id="open" type="date" required>
+        <label id="lblPer" for="per">Period:</label>
+        <select id="per" required></select>
+        <label id="lblMdate" for="mdate">Maturity Date:</label>
+        <input id="mdate" type="date" disabled>
+        <label id="lblTarget" for="target">Target Amount (LKR):</label>
+        <input id="target" type="number" min="0" step="0.01" required>
+        <label id="lblRate" for="rate">Interest Rate (%/yr):</label>
+        <input id="rate" type="number" min="0" step="0.01" required>
+        <div class="form-grid-full btns">
+          <button>🧮 <span id="bCalc1">Calc</span></button>
+          <button type="button" onclick="resetAll()">🧹 <span id="bClr1">Clear</span></button>
+          <button type="button" onclick="printRes('res1')">🖨️ <span id="bPrt1">Print</span></button>
+          <button type="button" onclick="mailRes('res1')">📧 <span id="bMail1">Email</span></button>
+        </div>
       </div>
     </form>
     <div id="res1" class="result"></div>
   </div>
-
-  <!-- Maturity Value -->
-  <div class="tab-content" id="mat">
-    <form id="formMat" onsubmit="event.preventDefault();calcMaturity()">
-      <label id="lblOpen2" for="open2">Opening Date:</label>
-      <input id="open2" type="date" required>
-      <label id="lblPer2"  for="per2">Period:</label>
-      <select id="per2" required></select>
-      <label id="lblMatDate2" for="mdate2">Maturity Date:</label>
-      <input id="mdate2" type="date" disabled>
-      <label id="lblAmt" for="amt">Deposit (LKR):</label>
-      <input id="amt" type="number" min="0" step="0.01" required>
-      <label id="lblRate2" for="rate2">Interest Rate (%/yr):</label>
-      <input id="rate2" type="number" min="0" step="0.01" required>
-      <div class="btns">
-        <button>🧮 <span id="btnCalc2">Calculate</span></button>
-        <button type="button" onclick="clearAll()">🧹 <span id="btnClr2">Clear</span></button>
-        <button type="button" onclick="printRes('res2')">🖨️ <span id="btnPrt2">Print</span></button>
-        <button type="button" onclick="mailRes('res2')">📧 <span id="btnMail2">Email</span></button>
+  <!-- Maturity -->
+  <div id="mat" class="tab-content">
+    <form id="formMat" onsubmit="event.preventDefault();calcMat()">
+      <div class="form-grid">
+        <label id="lblOpen2" for="open2">Opening Date:</label>
+        <input id="open2" type="date" required>
+        <label id="lblPer2" for="per2">Period:</label>
+        <select id="per2" required></select>
+        <label id="lblMdate2" for="mdate2">Maturity Date:</label>
+        <input id="mdate2" type="date" disabled>
+        <label id="lblAmt" for="amt">Deposit (LKR):</label>
+        <input id="amt" type="number" min="0" step="0.01" required>
+        <label id="lblRate2" for="rate2">Interest Rate (%/yr):</label>
+        <input id="rate2" type="number" min="0" step="0.01" required>
+        <div class="form-grid-full btns">
+          <button>🧮 <span id="bCalc2">Calc</span></button>
+          <button type="button" onclick="resetAll()">🧹 <span id="bClr2">Clear</span></button>
+          <button type="button" onclick="printRes('res2')">🖨️ <span id="bPrt2">Print</span></button>
+          <button type="button" onclick="mailRes('res2')">📧 <span id="bMail2">Email</span></button>
+        </div>
       </div>
     </form>
     <div id="res2" class="result"></div>
   </div>
 </div>
-
 <script>
 /* ---------- DATA ---------- */
-const years = [3,5,10,15,20];
-const months= [12,24,36,48,60];
-const dict = {
- en:{titlePr:'NSB Prarthana Savings Calculator',titleRe:'NSB Reality Savings Calculator',
-     req:'Required Deposit',mat:'Maturity Value',open:'Opening Date:',per:'Period:',
-     matDate:'Maturity Date:',target:'Target Amount (LKR):',deposit:'Deposit Amount (LKR):',
-     install:'Monthly Installment (LKR):',calc:'Calculate',clear:'Clear',print:'Print',email:'Email',
-     yearly:'years',monthly:'months',resDep:'Deposit today:',resEMI:'Monthly installment:',
-     resMat:'Maturity value:'},
- si:{titlePr:'NSB ප්‍රාර්ථනා ඉතිරිකරණ ගණකය',titleRe:'NSB රියැලිටි ඉතිරිකරණ ගණකය',
-     req:'අවශ්‍ය තැන්පතු',mat:'පිරිනැමීම් වටිනාකම',open:'ආරම්භක දිනය:',per:'කාලය:',
-     matDate:'පිරිනැමීම් දිනය:',target:'අරමුණු මුදල (රු.):',deposit:'තැන්පතු මුදල (රු.):',
-     install:'මාසික තැන්පතු (රු.):',calc:'ගණනය',clear:'පිරිසිදු',print:'මුද්‍රණය',email:'ඊ-තැපෑල',
-     yearly:'වසර',monthly:'මාස',resDep:'අද තැන්පතු:',resEMI:'මාසික තැන්පතු:',resMat:'අවසන් මුදල:'},
- ta:{titlePr:'NSB பரார்த்தனை சேமிப்பு',titleRe:'NSB ரியாலிட்டி சேமிப்பு',
-     req:'தேவைப்படும் வைப்பு',mat:'முடிவு மதிப்பு',open:'திறப்பு தேதி:',per:'காலம்:',
-     matDate:'முடிவு தேதி:',target:'இலக்கு தொகை (LKR):',deposit:'வைப்பு தொகை (LKR):',
-     install:'மாதாந்திர வைப்பு (LKR):',calc:'கணக்கிடு',clear:'அழி',print:'அச்சு',email:'மின்னஞ்சல்',
-     yearly:'ஆண்டு',monthly:'மாதம்',resDep:'இன்று வைப்பு:',resEMI:'மாதாந்திர வைப்பு:',resMat:'முடிவு தொகை:'}
-};
+const Y=[3,5,10,15,20], M=[12,24,36,48,60];
+const T={en:{titlePr:'NSB Prarthana Savings Calculator',titleRe:'NSB Reality Savings Calculator',req:'Required Deposit',mat:'Maturity Value',open:'Opening Date:',per:'Period:',matDate:'Maturity Date:',target:'Target Amount (LKR):',deposit:'Deposit Amount (LKR):',install:'Monthly Installment (LKR):',calc:'Calculate',clear:'Clear',print:'Print',email:'Email',yr:'years',mo:'months',resDep:'Deposit today:',resEMI:'Monthly installment:',resMat:'Maturity value:',msg1:'Fill all fields'},si:{titlePr:'NSB ප්‍රාර්ථනා ඉතිරිකරණ ගණකය',titleRe:'NSB රියැලිටි ඉතිරිකරණ ගණකය',req:'අවශ්‍ය තැන්පතු',mat:'පිරිනැමීම් වටිනාකම',open:'ආරම්භක දිනය:',per:'කාලය:',matDate:'පිරිනැමීම් දිනය:',target:'අරමුණු මුදල (රු.):',deposit:'තැන්පතු මුදල (රු.):',install:'මාසික තැන්පතු (රු.):',calc:'ගණනය',clear:'පිරිසිදු',print:'මුද්‍රණය',email:'විද්‍යුත් තැපෑල',yr:'වසර',mo:'මාස',resDep:'අද තැන්පතු:',resEMI:'මාසික තැන්පතු:',resMat:'අවසාන මුදල:',msg1:'සියලු ක්ෂේත්‍ර පුරවන්න'},ta:{titlePr:'NSB பராத்னா சேமிப்பு',titleRe:'NSB ரியாலிட்டி சேமிப்பு',req:'தேவை வைப்பு',mat:'முடிவு மதிப்பு',open:'திறப்பு தேதி:',per:'காலம்:',matDate:'முடிவு தேதி:',target:'இலக்கு தொகை (LKR):',deposit:'வைப்பு தொகை (LKR):',install:'மாத வைப்பு (LKR):',calc:'கணக்கிடு',clear:'அழி',print:'அச்சு',email:'மின்னஞ்சல்',yr:'ஆண்டு',mo:'மாதம்',resDep:'இன்று வைப்பு:',resEMI:'மாத சந்தா:',resMat:'முடிவு தொகை:',msg1:'எல்லா புலங்களையும் நிரப்பவும்'}};
 /* ---------- STATE ---------- */
-let product='prarthana';      // 'prarthana' or 'reality'
-let tab='req';                // 'req' or 'mat'
-/* ---------- HELPERS ---------- */
+let prod='prarthana',tab='req';
+/* ---------- HELP ---------- */
 const $=id=>document.getElementById(id);
-function toggleSidebar(){ $('sidebar').classList.toggle('open');}
-function closeSidebar(){ $('sidebar').classList.remove('open');}
-function lang(){return $('langSel').value;}
-function speak(text){if(!text||!speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang()==='si'?'si-LK':lang()==='ta'?'ta-IN':'en-US';speechSynthesis.cancel();speechSynthesis.speak(u);}
-function setOptions(sel,arr,label){sel.innerHTML='';arr.forEach(v=>{
-  const o=document.createElement('option');o.value=v;o.textContent=`${v} ${label}`;sel.appendChild(o);});}
-/* ---------- UI UPDATE ---------- */
-function applyLang(){const d=dict[lang()];
-  $('txtReq').textContent=d.req; $('txtMat').textContent=d.mat;
-  $('title').textContent=product==='prarthana'?d.titlePr:d.titleRe;
-  $('lblOpen').textContent=$('lblOpen2').textContent=d.open;
-  $('lblPer').textContent=d.per+(product==='prarthana'?' ('+d.yearly+')':' ('+d.monthly+')');
-  $('lblPer2').textContent=d.per+(product==='prarthana'?' ('+d.yearly+')':' ('+d.monthly+')');
-  $('lblMatDate').textContent=$('lblMatDate2').textContent=d.matDate;
-  $('lblTarget').textContent=d.target;
-  $('lblRate').textContent=$('lblRate2').textContent='Interest Rate (%/yr):';
-  $('lblAmt').textContent=product==='prarthana'?d.deposit:d.install;
-  // buttons
-  $('btnCalc1').textContent=$('btnCalc2').textContent=d.calc;
-  $('btnClr1').textContent=$('btnClr2').textContent=d.clear;
-  $('btnPrt1').textContent=$('btnPrt2').textContent=d.print;
-  $('btnMail1').textContent=$('btnMail2').textContent=d.email;
-  // period options
-  if(product==='prarthana'){setOptions($('per'),years,d.yearly);setOptions($('per2'),years,d.yearly);}
-  else{setOptions($('per'),months,d.monthly);setOptions($('per2'),months,d.monthly);}
-  updateMaturityDates();
-  speakInstructions();
-}
-/* ---------- TAB / PRODUCT SWITCH ---------- */
-function showTab(t){tab=t;document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
- $('req').classList.toggle('active',t==='req');$('mat').classList.toggle('active',t==='mat');
- $('tabReqBtn').classList.toggle('active',t==='req');$('tabMatBtn').classList.toggle('active',t==='mat');
- applyLang();}
-function switchProduct(p){product=p;clearAll();showTab('req');applyLang();}
-/* ---------- MATURITY DATE AUTO ---------- */
-function updateMaturityDates(){
-  const open=$('open').value, per=parseInt($('per').value||0);
-  if(open&&per){const d=new Date(open); product==='prarthana'?d.setFullYear(d.getFullYear()+per):d.setMonth(d.getMonth()+per);
-    $('mdate').value=d.toISOString().split('T')[0];}
-  else $('mdate').value='';
-  const open2=$('open2').value, per2=parseInt($('per2').value||0);
-  if(open2&&per2){const d2=new Date(open2); product==='prarthana'?d2.setFullYear(d2.getFullYear()+per2):d2.setMonth(d2.getMonth()+per2);
-    $('mdate2').value=d2.toISOString().split('T')[0];}
-  else $('mdate2').value='';
-}
-/* ---------- CALCULATIONS ---------- */
-function calcRequired(){
-  const d=dict[lang()];
-  const open=$('open').value,per=parseInt($('per').value),rate=parseFloat($('rate').value)/100,target=parseFloat($('target').value);
-  if(!open||!per||rate<0||isNaN(target)||target<=0){alert('Fill all fields');return;}
-  updateMaturityDates();
-  let res='';
-  if(product==='prarthana'){ // lump-sum P = A/(1+r)^t
-    const P=target/Math.pow(1+rate,per);
-    res=`${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.yearly}\n${d.resDep} LKR ${P.toFixed(2)}`;
-  }else{ // EMI = A*i /( (1+i)^n -1 )
-    const i=rate/12,n=per;
-    const emi=target*i/ (Math.pow(1+i,n)-1);
-    res=`${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.monthly}\n${d.resEMI} LKR ${emi.toFixed(2)}`;
-  }
-  $('res1').textContent=res; speak(res);
-}
-function calcMaturity(){
-  const d=dict[lang()];
-  const open=$('open2').value,per=parseInt($('per2').value),rate=parseFloat($('rate2').value)/100,amt=parseFloat($('amt').value);
-  if(!open||!per||rate<0||isNaN(amt)||amt<=0){alert('Fill all fields');return;}
-  updateMaturityDates();
-  let res='';
-  if(product==='prarthana'){ // A = P*(1+r)^t
-    const A=amt*Math.pow(1+rate,per);
-    res=`${d.deposit} ${amt.toFixed(2)}\n${d.per} ${per} ${d.yearly}\n${d.resMat} LKR ${A.toFixed(2)}`;
-  }else{ // monthly installment maturity
-    const i=rate/12,n=per;
-    const A=amt*((Math.pow(1+i,n)-1)/i);
-    res=`${d.install} ${amt.toFixed(2)}\n${d.per} ${per} ${d.monthly}\n${d.resMat} LKR ${A.toFixed(2)}`;
-  }
-  $('res2').textContent=res; speak(res);
-}
+function lang(){return $('lang').value}
+function speak(txt){if(!('speechSynthesis'in window)||!txt)return;const u=new SpeechSynthesisUtterance(txt);u.lang=lang()==='si'?'si-LK':lang()==='ta'?'ta-IN':'en-US';speechSynthesis.cancel();speechSynthesis.speak(u)}
+/* ---------- UI ---------- */
+function toggleSidebar(){ $('side').classList.toggle('open'); }
+function closeSidebar(){ $('side').classList.remove('open'); }
+function setProduct(p){prod=p;resetAll();applyLang();}
+function showTab(t){tab=t;['req','mat'].forEach(id=>$(id).classList.toggle('active',id===t));$('tabReqBtn').classList.toggle('active',t==='req');$('tabMatBtn').classList.toggle('active',t==='mat');applyLang();}
+function setOptions(sel,arr,unit){sel.innerHTML='';arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=`${v} ${unit}`;sel.appendChild(o);});}
+function applyLang(){const d=T[lang()]; $('title').textContent=prod==='prarthana'?d.titlePr:d.titleRe; $('txtReq').textContent=d.req; $('txtMat').textContent=d.mat;
+ $('lblOpen').textContent=$('lblOpen2').textContent=d.open; $('lblPer').textContent=$('lblPer2').textContent=d.per;
+ $('lblMdate').textContent=$('lblMdate2').textContent=d.matDate; $('lblTarget').textContent=d.target;
+ $('lblRate').textContent=$('lblRate2').textContent='Interest Rate (%/yr):'; $('lblAmt').textContent=prod==='prarthana'?d.deposit:d.install;
+ $('bCalc1').textContent=$('bCalc2').textContent=d.calc;$('bClr1').textContent=$('bClr2').textContent=d.clear;
+ $('bPrt1').textContent=$('bPrt2').textContent=d.print;$('bMail1').textContent=$('bMail2').textContent=d.email;
+ if(prod==='prarthana'){setOptions($('per'),Y,d.yr);setOptions($('per2'),Y,d.yr);}else{setOptions($('per'),M,d.mo);setOptions($('per2'),M,d.mo);}updateMdates();speakInstructions();}
+/* ---------- MATURITY DATES ---------- */
+function updateMdates(){const d1=$('open').value,v1=parseInt($('per').value);$('mdate').value=d1&&v1?calcMdate(d1,v1):'';const d2=$('open2').value,v2=parseInt($('per2').value);$('mdate2').value=d2&&v2?calcMdate(d2,v2):'';}
+function calcMdate(day,val){const d=new Date(day);prod==='prarthana'?d.setFullYear(d.getFullYear()+val):d.setMonth(d.getMonth()+val);return d.toISOString().split('T')[0];}
+['open','per','open2','per2'].forEach(id=>$(id).addEventListener('change',updateMdates));
+/* ---------- CALCULATE ---------- */
+function calcReq(){const d=T[lang()];const open=$('open').value,per=parseInt($('per').value),rate=parseFloat($('rate').value)/100,target=parseFloat($('target').value);if(!open||!per||!rate&&rate!==0||!target){alert(d.msg1);return;}updateMdates();let res='';if(prod==='prarthana'){const P=target/Math.pow(1+rate,per);res=`${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.yr}\n${d.resDep} LKR ${P.toFixed(2)}`;}else{const i=rate/12,n=per;const emi=target*i/(Math.pow(1+i,n)-1);res=`${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.mo}\n${d.resEMI} LKR ${emi.toFixed(2)}`;}$('res1').textContent=res;speak(res);}
+function calcMat(){const d=T[lang()];const open=$('open2').value,per=parseInt($('per2').value),rate=parseFloat($('rate2').value)/100,amt=parseFloat($('amt').value);if(!open||!per||!rate&&rate!==0||!amt){alert(d.msg1);return;}updateMdates();let res='';if(prod==='prarthana'){const A=amt*Math.pow(1+rate,per);res=`${d.deposit} ${amt.toFixed(2)}\n${d.per} ${per} ${d.yr}\n${d.resMat} LKR ${A.toFixed(2)}`;}else{const i=rate/12,n=per;const A=amt*((Math.pow(1+i,n)-1)/i);res=`${d.install} ${amt.toFixed(2)}\n${d.per} ${per} ${d.mo}\n${d.resMat} LKR ${A.toFixed(2)}`;}$('res2').textContent=res;speak(res);}
 /* ---------- UTIL ---------- */
-function clearAll(){['formReq','formMat'].forEach(id=>$(id).reset());['res1','res2'].forEach(id=>$(id).textContent='');updateMaturityDates();}
-function printRes(id){const c=$(id).textContent||'No result';const w=window.open('','_blank');w.document.write(`<pre>${c}</pre>`);w.print();}
+function resetAll(){['formReq','formMat'].forEach(f=>$(f).reset());['res1','res2'].forEach(r=>$(r).textContent='');updateMdates();}
+function printRes(id){const c=$(id).textContent||'No result';const w=window.open('','_blank');w.document.write('<pre>'+c+'</pre>');w.print();}
 function mailRes(id){const c=$(id).textContent;if(!c)return;window.location=`mailto:?subject=NSB%20Result&body=${encodeURIComponent(c)}`;}
-function speakInstructions(){const d=dict[lang()],txt=product==='prarthana'?d.instruction1:d.instruction2;speak(txt);}
-/* ---------- EVENT LISTEN ---------- */
-['open','per','open2','per2'].forEach(id=>$(id).addEventListener('change',updateMaturityDates));
+function speakInstructions(){const d=T[lang()];const txt=prod==='prarthana'?d.instruction1:d.instruction2;speak(txt);}
 /* ---------- INIT ---------- */
 applyLang();
 </script>
