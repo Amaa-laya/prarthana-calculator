@@ -38,6 +38,8 @@
       padding: 6px;
       font-size: 16px;
       border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
     }
     .tabs {
       display: flex;
@@ -54,6 +56,7 @@
       color: #000;
       user-select: none;
       white-space: nowrap;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .tab.active {
       background: #f58220;
@@ -84,6 +87,7 @@
       border: 2px solid #f58220;
       border-radius: 8px;
       font-size: 16px;
+      box-sizing: border-box;
     }
     button {
       padding: 10px 15px;
@@ -95,6 +99,13 @@
       margin-right: 10px;
       font-size: 15px;
       font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #e06d0f;
     }
     #result,
     #result2 {
@@ -103,6 +114,7 @@
       color: #1976d2;
       font-weight: bold;
       white-space: pre-wrap;
+      min-height: 40px;
     }
     .sidebar {
       position: fixed;
@@ -126,6 +138,7 @@
       text-decoration: none;
       color: white;
       font-size: 16px;
+      user-select: none;
     }
     .sidebar a:hover {
       background-color: #e06d0f;
@@ -142,174 +155,334 @@
       border-radius: 8px;
       padding: 5px 10px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      user-select: none;
     }
   </style>
 </head>
 <body>
-<div class="hamburger" onclick="toggleSidebar()">☰</div>
-<div id="sidebar" class="sidebar">
-  <a href="#" onclick="switchToTab('tab1'); closeSidebar();">Prarthana</a>
-  <a href="#" onclick="switchToTab('tab2'); closeSidebar();">Reality</a>
-</div>
-<div class="container">
-  <div class="language-selector">
-    <select id="language" onchange="changeLanguage(this.value)">
-      <option value="en">English</option>
-      <option value="si">සිංහල</option>
-      <option value="ta">தமிழ்</option>
-    </select>
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+  <div id="sidebar" class="sidebar">
+    <a href="#" onclick="switchToTab('tab1'); closeSidebar();">Prarthana</a>
+    <a href="#" onclick="switchToTab('tab2'); closeSidebar();">Reality</a>
   </div>
-  <h2 id="main-title">NSB Prarthana Savings Calculator</h2>
-  <div class="tabs">
-    <div class="tab active" onclick="showTab(event, 'tab1')">🪙 Required Deposit</div>
-    <div class="tab" onclick="showTab(event, 'tab2')">💰 Maturity Value</div>
-  </div>
-  <div id="tab1" class="tab-content active">
-    <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
-      <label for="expectedAmount">Expected Maturity Amount (LKR):</label>
-      <input type="number" id="expectedAmount" required />
-      <label for="interestRate">Interest Rate (% annual):</label>
-      <input type="number" id="interestRate" step="0.01" required />
-      <label for="period">Maturity Period (Years):</label>
-      <select id="period" required>
-        <option value="3">3</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
+  <div class="container">
+    <div class="language-selector">
+      <select id="language" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="si">සිංහල</option>
+        <option value="ta">தமிழ்</option>
       </select>
-      <button type="submit">🧮 Calculate</button>
-      <button type="button" onclick="clearForm('form1', 'result')">🧹 Clear</button>
-      <button type="button" onclick="printResult('result')">🖨️ Print</button>
-    </form>
-    <div id="result"></div>
+    </div>
+    <h2 id="main-title">NSB Prarthana Savings Calculator</h2>
+    <div class="tabs">
+      <div class="tab active" onclick="switchToTab('tab1')">🪙 Required Deposit</div>
+      <div class="tab" onclick="switchToTab('tab2')">💰 Maturity Value</div>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+      <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
+        <label for="expectedAmount">Expected Maturity Amount (LKR):</label>
+        <input type="number" id="expectedAmount" min="0" step="0.01" required />
+        <label for="interestRate">Interest Rate (% annual):</label>
+        <input type="number" id="interestRate" min="0" step="0.01" required />
+        <label for="period">Maturity Period (Years):</label>
+        <select id="period" required>
+          <option value="3">3</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+        <div style="margin-top:10px;">
+          <button type="submit" title="Calculate">
+            🧮 Calculate
+          </button>
+          <button type="button" title="Clear" onclick="clearForm('form1', 'result')">
+            🧹 Clear
+          </button>
+          <button type="button" title="Print" onclick="printResult('result')">
+            🖨️ Print
+          </button>
+          <button type="button" title="Email Result" onclick="emailResult('result')">
+            📧 Email
+          </button>
+        </div>
+      </form>
+      <div id="result"></div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+      <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
+        <label for="monthlyInstallment">Monthly Installment (LKR):</label>
+        <input type="number" id="monthlyInstallment" min="0" step="0.01" required />
+        <label for="interestRate2">Interest Rate (% annual):</label>
+        <input type="number" id="interestRate2" min="0" step="0.01" required />
+        <label for="months">Maturity Period (Months):</label>
+        <select id="months" required>
+          <option value="12">12</option>
+          <option value="24">24</option>
+          <option value="36">36</option>
+          <option value="48">48</option>
+          <option value="60">60</option>
+        </select>
+        <div style="margin-top:10px;">
+          <button type="submit" title="Calculate">
+            🧮 Calculate
+          </button>
+          <button type="button" title="Clear" onclick="clearForm('form2', 'result2')">
+            🧹 Clear
+          </button>
+          <button type="button" title="Print" onclick="printResult('result2')">
+            🖨️ Print
+          </button>
+          <button type="button" title="Email Result" onclick="emailResult('result2')">
+            📧 Email
+          </button>
+        </div>
+      </form>
+      <div id="result2"></div>
+    </div>
   </div>
-  <div id="tab2" class="tab-content">
-    <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
-      <label for="monthlyInstallment">Monthly Installment (LKR):</label>
-      <input type="number" id="monthlyInstallment" required />
-      <label for="interestRate2">Interest Rate (% annual):</label>
-      <input type="number" id="interestRate2" step="0.01" required />
-      <label for="months">Maturity Period (Months):</label>
-      <select id="months" required>
-        <option value="12">12</option>
-        <option value="24">24</option>
-        <option value="36">36</option>
-        <option value="48">48</option>
-        <option value="60">60</option>
-      </select>
-      <button type="submit">🧮 Calculate</button>
-      <button type="button" onclick="clearForm('form2', 'result2')">🧹 Clear</button>
-      <button type="button" onclick="printResult('result2')">🖨️ Print</button>
-    </form>
-    <div id="result2"></div>
-  </div>
-</div>
-<script>
-  const translations = {
-    en: {
-      prarthana: "NSB Prarthana Savings Calculator",
-      reality: "NSB Reality Savings Calculator",
-      instruction1: "Enter your expected maturity amount, interest rate, and period.",
-      instruction2: "Enter your monthly deposit, interest rate, and period."
-    },
-    si: {
-      prarthana: "NSB ප්‍රාර්ථනා ඉතිරිකිරීම් ගණකය",
-      reality: "NSB රියැලිටි ඉතිරිකිරීම් ගණකය",
-      instruction1: "ඔබේ බලාපොරොත්තු සහිත අවසන් මුදල, වාර්ෂික පොලී අනුපාතය සහ කාලය ඇතුළත් කරන්න.",
-      instruction2: "ඔබේ මාසික තැන්පතු, වාර්ෂික පොලී අනුපාතය සහ කාලය ඇතුළත් කරන්න."
-    },
-    ta: {
-      prarthana: "NSB பரார்த்தனை சேமிப்பு கணிப்பான்",
-      reality: "NSB ரியாலிட்டி சேமிப்பு கணிப்பான்",
-      instruction1: "உங்கள் எதிர்பார்க்கும் செல்வாக்கு தொகை, ஆண்டு வட்டி விகிதம் மற்றும் காலாவதியை உள்ளிடவும்.",
-      instruction2: "உங்கள் மாத அனுமதி, ஆண்டு வட்டி விகிதம் மற்றும் காலாவதியை உள்ளிடவும்."
+
+  <script>
+    // Translation texts
+    const translations = {
+      en: {
+        prarthana: "NSB Prarthana Savings Calculator",
+        reality: "NSB Reality Savings Calculator",
+        instruction1: "Enter your expected maturity amount, interest rate, and period.",
+        instruction2: "Enter your monthly deposit, interest rate, and period.",
+        expectedAmount: "Expected Maturity Amount (LKR):",
+        interestRate: "Interest Rate (% annual):",
+        period: "Maturity Period (Years):",
+        monthlyInstallment: "Monthly Installment (LKR):",
+        interestRate2: "Interest Rate (% annual):",
+        months: "Maturity Period (Months):",
+        buttons: {
+          calculate: "🧮 Calculate",
+          clear: "🧹 Clear",
+          print: "🖨️ Print",
+          email: "📧 Email"
+        }
+      },
+      si: {
+        prarthana: "NSB ප්‍රාර්ථනා ඉතිරිකිරීම් ගණකය",
+        reality: "NSB රියැලිටි ඉතිරිකිරීම් ගණකය",
+        instruction1: "ඔබේ බලාපොරොත්තු සහිත අවසන් මුදල, වාර්ෂික පොලී අනුපාතය සහ කාලය ඇතුළත් කරන්න.",
+        instruction2: "ඔබේ මාසික තැන්පතු, වාර්ෂික පොලී අනුපාතය සහ කාලය ඇතුළත් කරන්න.",
+        expectedAmount: "බලාපොරොත්තු සහිත අවසන් මුදල (රුපියල්):",
+        interestRate: "පොලී අනුපාතය (% වාර්ෂික):",
+        period: "කාල පරාසය (වසර):",
+        monthlyInstallment: "මාසික තැන්පතු (රුපියල්):",
+        interestRate2: "පොලී අනුපාතය (% වාර්ෂික):",
+        months: "කාල පරාසය (මාස):",
+        buttons: {
+          calculate: "🧮 ගණනය කරන්න",
+          clear: "🧹 පිරිසිදු කරන්න",
+          print: "🖨️ මුද්‍රණය කරන්න",
+          email: "📧 විද්‍යුත් තැපැල් කරන්න"
+        }
+      },
+      ta: {
+        prarthana: "NSB பரார்த்தனை சேமிப்பு கணிப்பான்",
+        reality: "NSB ரியாலிட்டி சேமிப்பு கணிப்பான்",
+        instruction1: "உங்கள் எதிர்பார்க்கும் செல்வாக்கு தொகை, ஆண்டு வட்டி விகிதம் மற்றும் காலாவதியை உள்ளிடவும்.",
+        instruction2: "உங்கள் மாத அனுமதி, ஆண்டு வட்டி விகிதம் மற்றும் காலாவதியை உள்ளிடவும்.",
+        expectedAmount: "எதிர்பார்க்கப்படும் முடிவு தொகை (LKR):",
+        interestRate: "வட்டி விகிதம் (% ஆண்டுக்கு):",
+        period: "காலம் (ஆண்டுகள்):",
+        monthlyInstallment: "மாதாந்திர தொகை (LKR):",
+        interestRate2: "வட்டி விகிதம் (% ஆண்டுக்கு):",
+        months: "காலம் (மாதங்கள்):",
+        buttons: {
+          calculate: "🧮 கணக்கிடு",
+          clear: "🧹 அழி",
+          print: "🖨️ அச்சிடு",
+          email: "📧 மின்னஞ்சல் அனுப்பு"
+        }
+      }
+    };
+
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
     }
-  };
-  function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("open");
-  }
-  function closeSidebar() {
-    document.getElementById("sidebar").classList.remove("open");
-  }
-  function switchToTab(tabId) {
-    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    document.querySelector(`.tab[onclick*='${tabId}']`).classList.add('active');
-    updateLanguageText();
-    speakInstruction();
-  }
-  function showTab(event, tabId) {
-    switchToTab(tabId);
-  }
-  function calculateDeposit() {
-    const A = parseFloat(document.getElementById("expectedAmount").value);
-    const r = parseFloat(document.getElementById("interestRate").value) / 100;
-    const t = parseInt(document.getElementById("period").value);
-    let P = A;
-    for (let i = 0; i < t; i++) {
-      P = P / (1 + r);
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("open");
     }
-    const result = `To receive LKR ${A.toFixed(2)} in ${t} years at ${(r * 100).toFixed(2)}% interest, deposit LKR ${P.toFixed(2)} today.`;
-    document.getElementById("result").textContent = result;
-    speakText(result);
-  }
-  function calculateMaturity() {
-    const monthly = parseFloat(document.getElementById("monthlyInstallment").value);
-    const r = parseFloat(document.getElementById("interestRate2").value) / 100;
-    const months = parseInt(document.getElementById("months").value);
-    const monthlyRate = r / 12;
-    let total = 0;
-    for (let i = 0; i < months; i++) {
-      total = (total + monthly) * (1 + monthlyRate);
+
+    // Tab switching
+    function switchToTab(tabId) {
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      // Activate correct tab button
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        if (tab.getAttribute('onclick')?.includes(tabId)) {
+          tab.classList.add('active');
+        }
+      });
+      updateLanguageText();
+      closeSidebar();
+      speakInstruction();
     }
-    const result = `With a monthly deposit of LKR ${monthly.toFixed(2)} for ${months} months at ${(r * 100).toFixed(2)}% interest, your maturity value will be LKR ${total.toFixed(2)}.`;
-    document.getElementById("result2").textContent = result;
-    speakText(result);
-  }
-  function clearForm(formId, resultId) {
-    document.getElementById(formId).reset();
-    document.getElementById(resultId).textContent = "";
-  }
-  function printResult(id) {
-    const content = document.getElementById(id).textContent;
-    if (!content) return;
-    const win = window.open('', '_blank');
-    win.document.write(`<pre>${content}</pre>`);
-    win.document.close();
-    win.print();
-  }
-  function getSelectedLang() {
-    return document.getElementById("language").value || "en";
-  }
-  function changeLanguage(lang) {
-    updateLanguageText();
-    speakInstruction();
-  }
-  function updateLanguageText() {
-    const lang = getSelectedLang();
-    const trans = translations[lang];
-    const tab1Active = document.getElementById("tab1").classList.contains("active");
-    document.getElementById("main-title").textContent = tab1Active ? trans.prarthana : trans.reality;
-  }
-  function speakInstruction() {
-    const msg = new SpeechSynthesisUtterance();
-    const lang = getSelectedLang();
-    msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
-    const tab1Active = document.getElementById("tab1").classList.contains("active");
-    msg.text = tab1Active ? translations[lang].instruction1 : translations[lang].instruction2;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(msg);
-  }
-  function speakText(text) {
-    if (!text) return;
-    const lang = getSelectedLang();
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
-    speechSynthesis.cancel();
-    speechSynthesis.speak(msg);
-  }
-</script>
+
+    // Calculation for Prarthana (Required Deposit)
+    function calculateDeposit() {
+      const A = parseFloat(document.getElementById("expectedAmount").value);
+      const r = parseFloat(document.getElementById("interestRate").value) / 100;
+      const t = parseInt(document.getElementById("period").value);
+
+      if (A <= 0 || r < 0 || t <= 0) {
+        alert("Please enter valid positive values.");
+        return;
+      }
+
+      // Compound interest yearly, lump sum deposit P such that:
+      // A = P * (1 + r)^t => P = A / (1 + r)^t
+      let P = A / Math.pow(1 + r, t);
+
+      const lang = getSelectedLang();
+      const resultText = {
+        en: `To receive LKR ${A.toFixed(2)} in ${t} years at ${ (r * 100).toFixed(2)}% annual interest,\nyou need to deposit LKR ${P.toFixed(2)} today.`,
+        si: `වසර ${t}ක් කාලයක් තුළ LKR ${A.toFixed(2)}ක් ලබා ගැනීමට\n${(r * 100).toFixed(2)}% වාර්ෂික පොලී අනුපාතයකදී,\nඅද LKR ${P.toFixed(2)}ක් තැන්පතු කළ යුතුය.`,
+        ta: `${t} ஆண்டுகளில் LKR ${A.toFixed(2)} பெற, வருடாந்திர வட்டிவிகிதம் ${(r * 100).toFixed(2)}% க்கில்,\nஇன்று LKR ${P.toFixed(2)} வைப்பு செய்ய வேண்டும்.`
+      };
+
+      document.getElementById("result").textContent = resultText[lang];
+      speakText(resultText[lang]);
+    }
+
+    // Calculation for Reality (Maturity Value from Monthly Installments)
+    function calculateMaturity() {
+      const monthly = parseFloat(document.getElementById("monthlyInstallment").value);
+      const r = parseFloat(document.getElementById("interestRate2").value) / 100;
+      const months = parseInt(document.getElementById("months").value);
+
+      if (monthly <= 0 || r < 0 || months <= 0) {
+        alert("Please enter valid positive values.");
+        return;
+      }
+
+      const monthlyRate = r / 12;
+      let total = 0;
+
+      // Compound monthly installments
+      for (let i = 0; i < months; i++) {
+        total = (total + monthly) * (1 + monthlyRate);
+      }
+
+      const lang = getSelectedLang();
+      const resultText = {
+        en: `With a monthly deposit of LKR ${monthly.toFixed(2)} for ${months} months at ${ (r * 100).toFixed(2)}% annual interest,\nyour maturity value will be LKR ${total.toFixed(2)}.`,
+        si: `LKR ${monthly.toFixed(2)} මාසික තැන්පතුවක් ${months} මාසයක් සඳහා\n${(r * 100).toFixed(2)}% වාර්ෂික පොලී අනුපාතයකදී,\nඔබගේ අවසන් මුදල LKR ${total.toFixed(2)} වේ.`,
+        ta: `${months} மாதங்களுக்கு மாதம் LKR ${monthly.toFixed(2)} வைப்பு விட்டு\nஆண்டு ${(r * 100).toFixed(2)}% வட்டி விகிதத்தில்,\nஉங்கள் முடிவுத் தொகை LKR ${total.toFixed(2)} ஆகும்.`
+      };
+
+      document.getElementById("result2").textContent = resultText[lang];
+      speakText(resultText[lang]);
+    }
+
+    // Clear form and result text
+    function clearForm(formId, resultId) {
+      document.getElementById(formId).reset();
+      document.getElementById(resultId).textContent = "";
+    }
+
+    // Print result text
+    function printResult(id) {
+      const content = document.getElementById(id).textContent;
+      if (!content) return alert("Nothing to print.");
+      const win = window.open('', '_blank');
+      win.document.write(`<pre style="font-family: Arial, sans-serif; font-size:16px;">${content}</pre>`);
+      win.document.close();
+      win.focus();
+      win.print();
+      win.close();
+    }
+
+    // Email result using mailto:
+    function emailResult(resultId) {
+      const content = document.getElementById(resultId).textContent;
+      if (!content) return alert("No result to email.");
+      const subject = encodeURIComponent("NSB Savings Calculator Result");
+      const body = encodeURIComponent(content);
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    // Get currently selected language code
+    function getSelectedLang() {
+      return document.getElementById("language").value || "en";
+    }
+
+    // Update text labels for language
+    function updateLanguageText() {
+      const lang = getSelectedLang();
+      const trans = translations[lang];
+
+      // Update main title
+      const tab1Active = document.getElementById("tab1").classList.contains("active");
+      document.getElementById("main-title").textContent = tab1Active ? trans.prarthana : trans.reality;
+
+      // Update labels in tab1
+      if (tab1Active) {
+        document.querySelector('label[for="expectedAmount"]').textContent = trans.expectedAmount;
+        document.querySelector('label[for="interestRate"]').textContent = trans.interestRate;
+        document.querySelector('label[for="period"]').textContent = trans.period;
+        const buttons = document.querySelectorAll('#tab1 button');
+        buttons[0].textContent = trans.buttons.calculate;
+        buttons[1].textContent = trans.buttons.clear;
+        buttons[2].textContent = trans.buttons.print;
+        buttons[3].textContent = trans.buttons.email;
+      }
+
+      // Update labels in tab2
+      if (!tab1Active) {
+        document.querySelector('label[for="monthlyInstallment"]').textContent = trans.monthlyInstallment;
+        document.querySelector('label[for="interestRate2"]').textContent = trans.interestRate2;
+        document.querySelector('label[for="months"]').textContent = trans.months;
+        const buttons = document.querySelectorAll('#tab2 button');
+        buttons[0].textContent = trans.buttons.calculate;
+        buttons[1].textContent = trans.buttons.clear;
+        buttons[2].textContent = trans.buttons.print;
+        buttons[3].textContent = trans.buttons.email;
+      }
+    }
+
+    // Speak instructions for current tab in selected language
+    function speakInstruction() {
+      if (!('speechSynthesis' in window)) return;
+      const msg = new SpeechSynthesisUtterance();
+      const lang = getSelectedLang();
+      msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
+      const tab1Active = document.getElementById("tab1").classList.contains("active");
+      msg.text = tab1Active ? translations[lang].instruction1 : translations[lang].instruction2;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(msg);
+    }
+
+    // Speak any text (used after calculation)
+    function speakText(text) {
+      if (!text || !('speechSynthesis' in window)) return;
+      const lang = getSelectedLang();
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = lang === 'si' ? 'si-LK' : lang === 'ta' ? 'ta-IN' : 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(msg);
+    }
+
+    // On language change, update labels and speak instructions
+    function changeLanguage(lang) {
+      updateLanguageText();
+      speakInstruction();
+    }
+
+    // On page load initialize
+    window.onload = () => {
+      updateLanguageText();
+      speakInstruction();
+    };
+  </script>
 </body>
 </html>
