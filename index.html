@@ -206,8 +206,8 @@
       </select>
       <label for="maturityDate2">Maturity Date:</label>
       <input type="date" id="maturityDate2" disabled />
-      <label for="depositAmount">Deposit Amount (LKR):</label>
-      <input type="number" id="depositAmount" required />
+      <label for="installment">Monthly Installment (LKR):</label>
+      <input type="number" id="installment" required />
       <label for="interestRate2">Interest Rate (% per year):</label>
       <input type="number" id="interestRate2" step="0.01" required />
       <button type="submit">Calculate Maturity</button>
@@ -222,11 +222,9 @@
   function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle("open");
   }
-
   function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open");
   }
-
   function switchToTab(tabId) {
     showTab(null, tabId);
     document.getElementById("main-title").textContent =
@@ -234,7 +232,6 @@
     currentTab = tabId;
     speakInstruction();
   }
-
   function showTab(event, tabId) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -242,7 +239,6 @@
     if (event && event.currentTarget) event.currentTarget.classList.add('active');
     currentTab = tabId;
   }
-
   function updateMaturityDate(openingId, periodId, maturityId) {
     const opening = document.getElementById(openingId).value;
     const years = parseInt(document.getElementById(periodId).value);
@@ -252,7 +248,6 @@
       document.getElementById(maturityId).value = date.toISOString().split('T')[0];
     }
   }
-
   function updateMaturityDateByMonths(openingId, periodId, maturityId) {
     const opening = document.getElementById(openingId).value;
     const months = parseInt(document.getElementById(periodId).value);
@@ -262,7 +257,6 @@
       document.getElementById(maturityId).value = date.toISOString().split('T')[0];
     }
   }
-
   function calculateDeposit() {
     const A = parseFloat(document.getElementById("expectedAmount").value);
     const r = parseFloat(document.getElementById("interestRate").value) / 100;
@@ -275,31 +269,28 @@
     document.getElementById("result").textContent = result;
     speakText(result);
   }
-
   function calculateMaturity() {
-    const P = parseFloat(document.getElementById("depositAmount").value);
+    const installment = parseFloat(document.getElementById("installment").value);
     const r = parseFloat(document.getElementById("interestRate2").value) / 100;
     const months = parseInt(document.getElementById("period2").value);
     const monthlyRate = r / 12;
-    let A = P;
+    let total = 0;
     for (let i = 0; i < months; i++) {
-      A += A * monthlyRate;
+      total = (total + installment) * (1 + monthlyRate);
     }
-    const result = `With LKR ${P.toFixed(2)} deposited for ${months} months at ${r * 100}% interest per year, you will receive LKR ${A.toFixed(2)}.`;
+    const result = `With a monthly installment of LKR ${installment.toFixed(2)} for ${months} months at ${r * 100}% interest per year, you will receive approximately LKR ${total.toFixed(2)}.`;
     document.getElementById("result2").textContent = result;
     speakText(result);
   }
-
   function speakInstruction() {
     let msg = new SpeechSynthesisUtterance();
     msg.lang = getSelectedLang();
     msg.text = currentTab === 'tab1'
       ? 'Enter your target amount and interest rate. We will calculate the deposit required.'
-      : 'Enter your deposit amount and interest rate. We will calculate the maturity value.';
+      : 'Enter your monthly installment and interest rate. We will calculate the maturity value.';
     speechSynthesis.cancel();
     speechSynthesis.speak(msg);
   }
-
   function speakText(text) {
     if (!text) return;
     const msg = new SpeechSynthesisUtterance(text);
@@ -307,14 +298,12 @@
     speechSynthesis.cancel();
     speechSynthesis.speak(msg);
   }
-
   function getSelectedLang() {
     const lang = document.querySelector('.language').value;
     if (lang === 'si') return 'si-LK';
     if (lang === 'ta') return 'ta-IN';
     return 'en-US';
   }
-
   function changeLanguage(lang) {
     speakInstruction();
   }
