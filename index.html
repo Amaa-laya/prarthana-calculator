@@ -152,8 +152,8 @@
 <body>
 <div class="hamburger" onclick="toggleSidebar()">☰</div>
 <div id="sidebar" class="sidebar">
-  <a href="#" onclick="switchToTab('tab1'); closeSidebar();">Prarthana</a>
-  <a href="#" onclick="switchToTab('tab2'); closeSidebar();">Reality</a>
+  <a href="#" onclick="loadCalculator('prarthana'); closeSidebar();">Prarthana</a>
+  <a href="#" onclick="loadCalculator('reality'); closeSidebar();">Reality</a>
 </div>
 <div class="container">
   <div class="language-selector">
@@ -165,21 +165,17 @@
   </div>
   <h2 id="main-title">NSB Prarthana Savings Calculator</h2>
   <div class="tabs">
-    <div class="tab active" onclick="showTab(event, 'tab1')">🪙 Required Deposit</div>
-    <div class="tab" onclick="showTab(event, 'tab2')">💰 Maturity Value</div>
+    <div class="tab active" onclick="showTab(event, 'required')">🪙 Required Deposit</div>
+    <div class="tab" onclick="showTab(event, 'maturity')">💰 Maturity Value</div>
   </div>
 
-  <div id="tab1" class="tab-content active">
-    <form id="form1" onsubmit="event.preventDefault(); calculateDeposit();">
+  <div id="required" class="tab-content active">
+    <form id="form1" onsubmit="event.preventDefault(); calculateRequired();">
       <label for="openingDate">Opening Date:</label>
       <input type="date" id="openingDate" required />
-      <label for="period">Maturity Period (Years):</label>
+      <label for="period">Period:</label>
       <select id="period" required onchange="updateMaturityDate('openingDate', 'period', 'maturityDate')">
-        <option value="3">3 years</option>
-        <option value="5">5 years</option>
-        <option value="10">10 years</option>
-        <option value="15">15 years</option>
-        <option value="20">20 years</option>
+        <!-- options dynamically injected -->
       </select>
       <label for="maturityDate">Maturity Date:</label>
       <input type="date" id="maturityDate" disabled />
@@ -187,110 +183,128 @@
       <input type="number" id="expectedAmount" required />
       <label for="interestRate">Interest Rate (%):</label>
       <input type="number" id="interestRate" step="0.01" required />
-      <button type="submit">Calculate Deposit</button>
+      <button type="submit">Calculate</button>
+      <button type="button" onclick="clearForm()">Clear</button>
+      <button type="button" onclick="printResult('result')">Print</button>
     </form>
     <div id="result"></div>
   </div>
 
-  <div id="tab2" class="tab-content">
+  <div id="maturity" class="tab-content">
     <form id="form2" onsubmit="event.preventDefault(); calculateMaturity();">
       <label for="openingDate2">Opening Date:</label>
       <input type="date" id="openingDate2" required />
-      <label for="period2">Maturity Period (Months):</label>
-      <select id="period2" required onchange="updateMaturityDateByMonths('openingDate2', 'period2', 'maturityDate2')">
-        <option value="12">12 months</option>
-        <option value="24">24 months</option>
-        <option value="36">36 months</option>
-        <option value="48">48 months</option>
-        <option value="60">60 months</option>
+      <label for="period2">Period:</label>
+      <select id="period2" required onchange="updateMaturityDate('openingDate2', 'period2', 'maturityDate2')">
+        <!-- options dynamically injected -->
       </select>
       <label for="maturityDate2">Maturity Date:</label>
       <input type="date" id="maturityDate2" disabled />
-      <label for="installment">Monthly Installment (LKR):</label>
-      <input type="number" id="installment" required />
-      <label for="interestRate2">Interest Rate (% per year):</label>
+      <label for="depositAmount">Monthly Installment (LKR):</label>
+      <input type="number" id="depositAmount" required />
+      <label for="interestRate2">Interest Rate (%):</label>
       <input type="number" id="interestRate2" step="0.01" required />
-      <button type="submit">Calculate Maturity</button>
+      <button type="submit">Calculate</button>
+      <button type="button" onclick="clearForm()">Clear</button>
+      <button type="button" onclick="printResult('result2')">Print</button>
     </form>
     <div id="result2"></div>
   </div>
 </div>
 
 <script>
-  let currentTab = 'tab1';
+  let currentMode = 'prarthana'; // or 'reality'
 
   function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle("open");
   }
+
   function closeSidebar() {
     document.getElementById("sidebar").classList.remove("open");
   }
-  function switchToTab(tabId) {
-    showTab(null, tabId);
-    document.getElementById("main-title").textContent =
-      tabId === 'tab1' ? "NSB Prarthana Savings Calculator" : "NSB Reality Savings Calculator";
-    currentTab = tabId;
+
+  function loadCalculator(mode) {
+    currentMode = mode;
+    document.getElementById('main-title').textContent = mode === 'prarthana'
+      ? 'NSB Prarthana Savings Calculator'
+      : 'NSB Reality Savings Calculator';
+    const period1 = document.getElementById('period');
+    const period2 = document.getElementById('period2');
+    period1.innerHTML = '';
+    period2.innerHTML = '';
+    const options = mode === 'prarthana'
+      ? [3, 5, 10, 15, 20].map(y => `<option value="${y}">${y} years</option>`)
+      : [12, 24, 36, 48, 60].map(m => `<option value="${m}">${m} months</option>`);
+    period1.innerHTML = options.join('');
+    period2.innerHTML = options.join('');
     speakInstruction();
   }
+
   function showTab(event, tabId) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    if (event && event.currentTarget) event.currentTarget.classList.add('active');
-    currentTab = tabId;
+    event.currentTarget.classList.add('active');
   }
+
   function updateMaturityDate(openingId, periodId, maturityId) {
     const opening = document.getElementById(openingId).value;
-    const years = parseInt(document.getElementById(periodId).value);
-    if (opening && years) {
+    const period = parseInt(document.getElementById(periodId).value);
+    if (opening && period) {
       const date = new Date(opening);
-      date.setFullYear(date.getFullYear() + years);
+      if (currentMode === 'prarthana') date.setFullYear(date.getFullYear() + period);
+      else date.setMonth(date.getMonth() + period);
       document.getElementById(maturityId).value = date.toISOString().split('T')[0];
     }
   }
-  function updateMaturityDateByMonths(openingId, periodId, maturityId) {
-    const opening = document.getElementById(openingId).value;
-    const months = parseInt(document.getElementById(periodId).value);
-    if (opening && months) {
-      const date = new Date(opening);
-      date.setMonth(date.getMonth() + months);
-      document.getElementById(maturityId).value = date.toISOString().split('T')[0];
-    }
-  }
-  function calculateDeposit() {
+
+  function calculateRequired() {
     const A = parseFloat(document.getElementById("expectedAmount").value);
     const r = parseFloat(document.getElementById("interestRate").value) / 100;
     const t = parseInt(document.getElementById("period").value);
-    let P = A;
-    for (let i = 0; i < t; i++) {
-      P = P / (1 + r);
+    let result;
+    if (currentMode === 'prarthana') {
+      let P = A;
+      for (let i = 0; i < t; i++) P /= (1 + r);
+      result = `To receive LKR ${A.toFixed(2)} in ${t} years at ${r * 100}% interest, deposit LKR ${P.toFixed(2)} today.`;
+    } else {
+      const monthlyRate = r / 12;
+      const factor = (Math.pow(1 + monthlyRate, t) - 1) / monthlyRate;
+      const monthly = A / factor;
+      result = `To receive LKR ${A.toFixed(2)} in ${t} months at ${r * 100}% annual interest, deposit LKR ${monthly.toFixed(2)} per month.`;
     }
-    const result = `To receive LKR ${A.toFixed(2)} in ${t} years at ${r * 100}% interest, deposit LKR ${P.toFixed(2)} today.`;
     document.getElementById("result").textContent = result;
     speakText(result);
   }
+
   function calculateMaturity() {
-    const installment = parseFloat(document.getElementById("installment").value);
+    const P = parseFloat(document.getElementById("depositAmount").value);
     const r = parseFloat(document.getElementById("interestRate2").value) / 100;
-    const months = parseInt(document.getElementById("period2").value);
-    const monthlyRate = r / 12;
-    let total = 0;
-    for (let i = 0; i < months; i++) {
-      total = (total + installment) * (1 + monthlyRate);
+    const t = parseInt(document.getElementById("period2").value);
+    let result;
+    if (currentMode === 'prarthana') {
+      let A = P;
+      for (let i = 0; i < t; i++) A *= (1 + r);
+      result = `With LKR ${P.toFixed(2)} deposited for ${t} years at ${r * 100}% interest, you'll receive LKR ${A.toFixed(2)}.`;
+    } else {
+      const monthlyRate = r / 12;
+      const A = P * ((Math.pow(1 + monthlyRate, t) - 1) / monthlyRate);
+      result = `With LKR ${P.toFixed(2)} monthly installment for ${t} months at ${r * 100}% annual interest, you'll receive LKR ${A.toFixed(2)}.`;
     }
-    const result = `With a monthly installment of LKR ${installment.toFixed(2)} for ${months} months at ${r * 100}% interest per year, you will receive approximately LKR ${total.toFixed(2)}.`;
     document.getElementById("result2").textContent = result;
     speakText(result);
   }
+
   function speakInstruction() {
     let msg = new SpeechSynthesisUtterance();
     msg.lang = getSelectedLang();
-    msg.text = currentTab === 'tab1'
-      ? 'Enter your target amount and interest rate. We will calculate the deposit required.'
-      : 'Enter your monthly installment and interest rate. We will calculate the maturity value.';
+    msg.text = currentMode === 'prarthana'
+      ? 'Enter your deposit or target value for Prarthana. Interest is added yearly.'
+      : 'Enter your monthly deposit or goal for Reality. Interest is added monthly.';
     speechSynthesis.cancel();
     speechSynthesis.speak(msg);
   }
+
   function speakText(text) {
     if (!text) return;
     const msg = new SpeechSynthesisUtterance(text);
@@ -298,15 +312,39 @@
     speechSynthesis.cancel();
     speechSynthesis.speak(msg);
   }
+
   function getSelectedLang() {
     const lang = document.querySelector('.language').value;
     if (lang === 'si') return 'si-LK';
     if (lang === 'ta') return 'ta-IN';
     return 'en-US';
   }
-  function changeLanguage(lang) {
+
+  function changeLanguage() {
     speakInstruction();
   }
+
+  function clearForm() {
+    document.querySelectorAll('input, select').forEach(el => {
+      if (!el.disabled) el.value = '';
+    });
+    document.getElementById("result").textContent = '';
+    document.getElementById("result2").textContent = '';
+  }
+
+  function printResult(resultId) {
+    const content = document.getElementById(resultId).textContent;
+    if (!content) return;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<html><head><title>Print</title></head><body><pre>${content}</pre></body></html>`);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  }
+
+  // load default
+  window.onload = () => loadCalculator('prarthana');
 </script>
 </body>
 </html>
