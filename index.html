@@ -1,270 +1,642 @@
-<!--
-  NSB Savings Calculator – Fully Commented Version                                     
-  -----------------------------------------------------------------------------
-  * Prarthana product  : yearly compounding (period in YEARS)
-  * Reality   product  : monthly compounding (period in MONTHS)
-  * Two inner tabs     : Required Deposit / Maturity Value
-  * Sidebar            : switch between Prarthana & Reality
-  * Language dropdown  : English / Sinhala / Tamil   (all labels + voice)
-  * Voice output       : reads results in selected language
-  * Buttons            : Calculate, Clear, Print, Email
-  * Responsive layout  : CSS‑Grid keeps labels & inputs aligned on any screen
-  -----------------------------------------------------------------------------
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>NSB Savings Calculator</title>
-
-<!-- =====================  STYLES  ===================== -->
 <style>
-:root{
-  --nsb:#f58220;          /* NSB brand orange */
-  --grey:#e0e0e0;         /* neutral light grey */
-}
-/* --- overall page --- */
-body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f5f5f5;
-     display:flex;justify-content:center;align-items:center;min-height:100vh}
-/* card */
-.container{background:#fff;padding:28px 26px;border-radius:16px;
-           box-shadow:0 4px 18px rgba(0,0,0,.1);max-width:960px;width:100%;box-sizing:border-box}
-h2{margin:0 0 22px;text-align:center;color:var(--nsb)}
-/* hamburger + sidebar */
-.hamburger{position:fixed;top:18px;left:18px;background:#fff;color:var(--nsb);font-size:28px;
-           padding:6px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);
-           cursor:pointer;z-index:1100;user-select:none}
-.sidebar{position:fixed;left:-260px;top:0;width:260px;height:100%;background:var(--nsb);
-         padding-top:60px;transition:left .3s ease;z-index:1000}
-.sidebar.open{left:0}
-.sidebar a{display:block;padding:16px 24px;color:#fff;text-decoration:none;font-weight:bold}
-.sidebar a:hover{background:#e06d0f}
-/* language selector */
-.lang{display:flex;justify-content:flex-end;margin-bottom:10px}
-.lang select{padding:6px 10px;border-radius:6px;border:1px solid #ccc;font-size:15px}
-/* product tabs (Prarthana / Reality) */
-.tabs{display:flex;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-.tab{background:var(--grey);padding:10px 24px;margin:4px;border-radius:8px;cursor:pointer;
-     white-space:nowrap;user-select:none;transition:.3s}
-.tab.active{background:var(--nsb);color:#fff}
-/* inner tab content */
-.tab-content{display:none}
-.tab-content.active{display:block}
-/* form layout */
-form{border:2px solid var(--nsb);padding:20px;border-radius:12px}
-.form-grid{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;gap:12px 20px;align-items:center}
-.form-grid-full{grid-column:1/-1}
-/* single‑column on small mobile */
-@media(max-width:540px){.form-grid{grid-template-columns:1fr}}
-label{font-weight:600}
-input,select{width:100%;padding:10px;border:2px solid var(--nsb);border-radius:8px;font-size:15px;box-sizing:border-box;max-width:100%}
-/* buttons */
-.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-button{background:var(--nsb);color:#fff;border:none;border-radius:5px;padding:9px 14px;font-size:15px;font-weight:600;
-       display:inline-flex;align-items:center;gap:6px;cursor:pointer}
-button:hover{background:#e06d0f}
-/* result area */
-.result{margin-top:18px;min-height:60px;font-size:17px;font-weight:bold;color:#1976d2;white-space:pre-wrap}
+  :root {
+    --nsb: #f58220;
+    --grey: #e0e0e0;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 50px;
+  }
+  .container {
+    background: #fff;
+    padding: 28px 26px;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.1);
+    max-width: 960px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  h2 {
+    margin: 0 0 22px;
+    text-align: center;
+    color: var(--nsb);
+  }
+  /* Sidebar */
+  .hamburger {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    background: #fff;
+    color: var(--nsb);
+    font-size: 28px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    cursor: pointer;
+    z-index: 1100;
+    user-select: none;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 260px;
+    height: 100%;
+    background: var(--nsb);
+    padding-top: 60px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-sizing: border-box;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .sidebar a {
+    display: block;
+    padding: 16px 24px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .sidebar a:hover {
+    background: #e06d0f;
+  }
+  /* Language selector */
+  .lang {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  .lang select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+  }
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .tab {
+    background: var(--grey);
+    padding: 10px 24px;
+    margin: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: 0.3s;
+  }
+  .tab.active {
+    background: var(--nsb);
+    color: #fff;
+  }
+  /* Tab content */
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+  /* Form */
+  form {
+    border: 2px solid var(--nsb);
+    padding: 20px;
+    border-radius: 12px;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 2fr;
+    gap: 12px 20px;
+    align-items: center;
+  }
+  .form-grid-full {
+    grid-column: 1/-1;
+  }
+  @media(max-width: 540px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  label {
+    font-weight: 600;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--nsb);
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  .btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  button {
+    background: var(--nsb);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 9px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  button:hover {
+    background: #e06d0f;
+  }
+  .result {
+    margin-top: 18px;
+    min-height: 80px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #1976d2;
+    white-space: pre-wrap;
+  }
 </style>
 </head>
-
 <body>
-<!-- ====== HAMBURGER & SIDEBAR ====== -->
+
+<!-- Sidebar hamburger -->
 <span class="hamburger" onclick="toggleSidebar()">☰</span>
-<nav id="side" class="sidebar">
+
+<!-- Sidebar menu -->
+<nav id="sidebar" class="sidebar">
   <a href="#" onclick="setProduct('prarthana');closeSidebar()">Prarthana</a>
   <a href="#" onclick="setProduct('reality');closeSidebar()">Reality</a>
 </nav>
 
-<!-- ========== MAIN CARD ========== -->
+<!-- Main container -->
 <div class="container">
-  <!-- language selector -->
-  <div class="lang"><select id="lang" onchange="applyLang()">
-      <option value="en">English</option><option value="si">සිංහල</option><option value="ta">தமிழ்</option></select></div>
+  <!-- Language selector -->
+  <div class="lang">
+    <select id="lang" onchange="applyLang()">
+      <option value="en">English</option>
+      <option value="si">සිංහල</option>
+      <option value="ta">தமிழ்</option>
+    </select>
+  </div>
 
+  <!-- Title -->
   <h2 id="title">NSB Prarthana Savings Calculator</h2>
 
-  <!-- inner tabs (required / maturity) -->
+  <!-- Tabs -->
   <div class="tabs">
     <div id="tabReqBtn" class="tab active" onclick="showTab('req')">🪙 <span id="txtReq">Required Deposit</span></div>
     <div id="tabMatBtn" class="tab" onclick="showTab('mat')">💰 <span id="txtMat">Maturity Value</span></div>
   </div>
 
-  <!-- ===== Required Deposit FORM ===== -->
+  <!-- Required Deposit Tab -->
   <div id="req" class="tab-content active">
-    <form id="formReq" onsubmit="event.preventDefault();calcReq()">
+    <form id="formReq" onsubmit="event.preventDefault(); calcReq()">
       <div class="form-grid">
-        <label id="lblOpen"   for="open">Opening Date:</label>
-        <input  id="open" type="date" required>
-
-        <label id="lblPer"    for="per">Period:</label>
-        <select id="per" required></select>
-
-        <label id="lblMdate"  for="mdate">Maturity Date:</label>
-        <input  id="mdate" type="date" disabled>
-
+        <label id="lblOpen" for="open">Opening Date:</label>
+        <input id="open" type="date" required onchange="updateMaturityDate()">
+        
+        <label id="lblPer" for="per">Period:</label>
+        <select id="per" required onchange="updateMaturityDate()"></select>
+        
+        <label id="lblMdate" for="mdate">Maturity Date:</label>
+        <input id="mdate" type="date" disabled>
+        
         <label id="lblTarget" for="target">Target Amount (LKR):</label>
-        <input  id="target" type="number" min="0" step="0.01" required>
-
-        <label id="lblRate"   for="rate">Interest Rate (%/yr):</label>
-        <input  id="rate" type="number" min="0" step="0.01" required>
-
-        <!-- BUTTONS -->
-        <div class="form-grid-full btns">
-          <button>🧮 <span id="bCalc1">Calculate</span></button>
-          <button type="button" onclick="resetAll()">🧹 <span id="bClr1">Clear</span></button>
-          <button type="button" onclick="printRes('res1')">🖨️ <span id="bPrt1">Print</span></button>
-          <button type="button" onclick="mailRes('res1')">📧 <span id="bMail1">Email</span></button>
-        </div>
+        <input id="target" type="number" min="0" step="0.01" required>
+        
+        <label id="lblRate" for="rate">Interest Rate (%/yr):</label>
+        <input id="rate" type="number" min="0" step="0.01" required>
+      </div>
+      <div class="btns form-grid-full">
+        <button type="submit">🧮 <span id="bCalc1">Calculate</span></button>
+        <button type="button" onclick="resetAll()">🧹 <span id="bClr1">Clear</span></button>
+        <button type="button" onclick="printRes('res1')">🖨️ <span id="bPrt1">Print</span></button>
+        <button type="button" onclick="mailRes('res1')">📧 <span id="bMail1">Email</span></button>
       </div>
     </form>
     <div id="res1" class="result"></div>
   </div>
 
-  <!-- ===== Maturity Value FORM ===== -->
+  <!-- Maturity Value Tab -->
   <div id="mat" class="tab-content">
-    <form id="formMat" onsubmit="event.preventDefault();calcMat()">
+    <form id="formMat" onsubmit="event.preventDefault(); calcMat()">
       <div class="form-grid">
-        <label id="lblOpen2"   for="open2">Opening Date:</label>
-        <input  id="open2" type="date" required>
-
-        <label id="lblPer2"    for="per2">Period:</label>
-        <select id="per2" required></select>
-
-        <label id="lblMdate2"  for="mdate2">Maturity Date:</label>
-        <input  id="mdate2" type="date" disabled>
-
-        <label id="lblAmt"     for="amt">Deposit (LKR):</label>
-        <input  id="amt" type="number" min="0" step="0.01" required>
-
-        <label id="lblRate2"   for="rate2">Interest Rate (%/yr):</label>
-        <input  id="rate2" type="number" min="0" step="0.01" required>
-
-        <!-- BUTTONS -->
-        <div class="form-grid-full btns">
-          <button>🧮 <span id="bCalc2">Calculate</span></button>
-          <button type="button" onclick="resetAll()">🧹 <span id="bClr2">Clear</span></button>
-          <button type="button" onclick="printRes('res2')">🖨️ <span id="bPrt2">Print</span></button>
-          <button type="button" onclick="mailRes('res2')">📧 <span id="bMail2">Email</span></button>
-        </div>
+        <label id="lblOpen2" for="open2">Opening Date:</label>
+        <input id="open2" type="date" required onchange="updateMaturityDateMat()">
+        
+        <label id="lblPer2" for="per2">Period:</label>
+        <select id="per2" required onchange="updateMaturityDateMat()"></select>
+        
+        <label id="lblMdate2" for="mdate2">Maturity Date:</label>
+        <input id="mdate2" type="date" disabled>
+        
+        <label id="lblAmt" for="amt">Monthly Installment (LKR):</label>
+        <input id="amt" type="number" min="0" step="0.01" required>
+        
+        <label id="lblRate2" for="rate2">Interest Rate (%/mo):</label>
+        <input id="rate2" type="number" min="0" step="0.01" required>
+      </div>
+      <div class="btns form-grid-full">
+        <button type="submit">🧮 <span id="bCalc2">Calculate</span></button>
+        <button type="button" onclick="resetAll()">🧹 <span id="bClr2">Clear</span></button>
+        <button type="button" onclick="printRes('res2')">🖨️ <span id="bPrt2">Print</span></button>
+        <button type="button" onclick="mailRes('res2')">📧 <span id="bMail2">Email</span></button>
       </div>
     </form>
     <div id="res2" class="result"></div>
   </div>
 </div>
 
-<!-- =====================  JAVASCRIPT  ===================== -->
 <script>
-/* -----------------------------------------------------------
-   CONSTANT DATA
-----------------------------------------------------------------*/
-const Y = [3,5,10,15,20];            // years list for Prarthana
-const M = [12,24,36,48,60];          // months list for Reality
-/* Language dictionary for UI & speech */
+// Utility function shortcut
+const $ = id => document.getElementById(id);
+
+// Product and language globals
+let prod = 'prarthana'; // 'prarthana' or 'reality'
+
+// Period options
+const Y = [3, 5, 10, 15, 20];  // years for Prarthana
+const M = [12, 24, 36, 48, 60]; // months for Reality
+
+// Language dictionary (all labels & buttons)
 const TXT = {
-  en:{titlePr:'NSB Prarthana Savings Calculator',titleRe:'NSB Reality Savings Calculator',req:'Required Deposit',mat:'Maturity Value',open:'Opening Date:',per:'Period:',matDate:'Maturity Date:',target:'Target Amount (LKR):',deposit:'Deposit Amount (LKR):',install:'Monthly Installment (LKR):',calc:'Calculate',clear:'Clear',print:'Print',email:'Email',yr:'years',mo:'months',resDep:'Deposit today:',resEMI:'Monthly installment:',resMat:'Maturity value:',msg1:'Please fill all fields'},
-  si:{titlePr:'NSB ප්‍රාර්ථනා ඉතිරිකරණ ගණකය',titleRe:'NSB රියැලිටි ඉතිරිකරණ ගණකය',req:'අවශ්‍ය තැන්පතු',mat:'පිරිනැමීම් වටිනාකම',open:'ආරම්භක දිනය:',per:'කාලය:',matDate:'පිරිනැමීම් දිනය:',target:'අරමුණු මුදල (රු.):',deposit:'තැන්පතු මුදල (රු.):',install:'මාසික තැන්පතු (රු.):',calc:'ගණනය',clear:'පිරිසිදු',print:'මුද්‍රණය',email:'විද්‍යුත් තැපෑල',yr:'වසර',mo:'මාස',resDep:'අද තැන්පතු:',resEMI:'මාසික තැන්පතු:',resMat:'අවසාන මුදල:',msg1:'කරුණාකර සියළු ක්ෂේත්‍ර පිරවන්න'},
-  ta:{titlePr:'NSB பரார்த்தனை சேமிப்பு கணிப்பான்',titleRe:'NSB ரியாலிட்டி சேமிப்பு கணிப்பான்',req:'தேவைப்படும் வைப்பு',mat:'முடிவு மதிப்பு',open:'திறப்பு தேதி:',per:'காலம்:',matDate:'முடிவு தேதி:',target:'இலக்கு தொகை (LKR):',deposit:'வைப்பு தொகை (LKR):',install:'மாதாந்திர வைப்பு (LKR):',calc:'கணக்கிடு',clear:'அழி',print:'அச்சு',email:'மின்னஞ்சல்',yr:'ஆண்டு',mo:'மாதம்',resDep:'இன்று வைப்பு:',resEMI:'மாத சந்தா:',resMat:'முடிவு தொகை:',msg1:'அனைத்து புலங்களையும் நிரப்பவும்'}
+  en: {
+    titlePr: 'NSB Prarthana Savings Calculator',
+    titleRe: 'NSB Reality Savings Calculator',
+    req: 'Required Deposit',
+    mat: 'Maturity Value',
+    target: 'Target Amount (LKR):',
+    deposit: 'Deposit Amount (LKR):',
+    install: 'Monthly Installment (LKR):',
+    calc: 'Calculate',
+    clear: 'Clear',
+    print: 'Print',
+    email: 'Email',
+    open: 'Opening Date:',
+    per: 'Period:',
+    matDate: 'Maturity Date:',
+    rateYr: 'Interest Rate (%/yr):',
+    rateMo: 'Interest Rate (%/mo):'
+  },
+  si: {
+    titlePr: 'NSB ප්‍රාර්ථනා ඉතිරිකරණ ගණකය',
+    titleRe: 'NSB රියැලිටි ඉතිරිකරණ ගණකය',
+    req: 'අවශ්‍ය තැන්පතු',
+    mat: 'පිරිනැමීම් වටිනාකම',
+    target: 'අරමුණු මුදල (රු.):',
+    deposit: 'තැන්පතු මුදල (රු.):',
+    install: 'මාසික තැන්පතු (රු.):',
+    calc: 'ගණනය',
+    clear: 'කළල',
+    print: 'මුද්‍රණය',
+    email: 'ඊ-තැපෑල',
+    open: 'විවෘත කරන දිනය:',
+    per: 'කාලය:',
+    matDate: 'පිරිනැමීම් දිනය:',
+    rateYr: 'පොලී අනුපාතය (% වසර):',
+    rateMo: 'පොලී අනුපාතය (% මාසික):'
+  },
+  ta: {
+    titlePr: 'NSB பராத்தனா சேமிப்பு கணிப்பான்',
+    titleRe: 'NSB ரியாலிட்டி சேமிப்பு கணிப்பான்',
+    req: 'தேவைப்படும் வைப்பு',
+    mat: 'முடிவு மதிப்பு',
+    target: 'இலக்கு தொகை (ரூ.)',
+    deposit: 'வைப்பு தொகை (ரூ.)',
+    install: 'மாதாந்திர வைப்பு (ரூ.)',
+    calc: 'கணக்கிடு',
+    clear: 'அழி',
+    print: 'அச்சு',
+    email: 'மின்னஞ்சல்',
+    open: 'திறக்கும் தேதி:',
+    per: 'காலம்:',
+    matDate: 'முடிவு தேதி:',
+    rateYr: 'வட்டி விகிதம் (%/ஆண்டு):',
+    rateMo: 'வட்டி விகிதம் (%/மாதம்):'
+  }
 };
 
-/* -----------------------------------------------------------
-   GLOBAL STATE                                         
-----------------------------------------------------------------*/
-let prod = 'prarthana';   // current product (prarthana | reality)
-let tab  = 'req';          // current inner tab  (req | mat)
-/* Helper for DOM */
-const $ = id => document.getElementById(id);
-const curLang = () => $('lang').value;
+// Helper: get current language from dropdown
+function curLang() {
+  return $('lang').value || 'en';
+}
 
-/* -----------------------------------------------------------
-   SIDEBAR + NAVIGATION
-----------------------------------------------------------------*/
-function toggleSidebar(){ $('side').classList.toggle('open'); }
-function closeSidebar(){ $('side').classList.remove('open'); }
+// Show/hide sidebar
+function toggleSidebar() {
+  $('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  $('sidebar').classList.remove('open');
+}
 
-function setProduct(p){ prod = p; resetAll(); applyLang(); }
-function showTab(t){ tab = t; ['req','mat'].forEach(id=>$(id).classList.toggle('active',id===t)); $('tabReqBtn').classList.toggle('active',t==='req'); $('tabMatBtn').classList.toggle('active',t==='mat'); applyLang(); }
+// Switch product and update UI accordingly
+function setProduct(p) {
+  prod = p;
+  applyLang();
+  populatePeriods();
+  resetAll();
+  showTab('req'); // default tab when switching product
+  closeSidebar();
+}
 
-/* -----------------------------------------------------------
-   LANGUAGE HANDLING
-----------------------------------------------------------------*/
-function setOptions(sel,array,unit){ sel.innerHTML=''; array.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=`${v} ${unit}`; sel.appendChild(o); }); }
-function applyLang(){ const d = TXT[curLang()];
-  // main title & tab labels
-  $('title').textContent = prod==='prarthana'?d.titlePr:d.titleRe;
-  $('txtReq').textContent = d.req; $('txtMat').textContent = d.mat;
-  // labels
-  $('lblOpen').textContent=$('lblOpen2').textContent=d.open;
-  $('lblPer').textContent=$('lblPer2').textContent=d.per;
-  $('lblMdate').textContent=$('lblMdate2').textContent=d.matDate;
-  $('lblTarget').textContent=d.target;
-  $('lblRate').textContent=$('lblRate2').textContent='Interest Rate (%/yr):';
-  $('lblAmt').textContent = prod==='prarthana'?d.deposit:d.install;
-  // buttons
-  $('bCalc1').textContent=$('bCalc2').textContent=d.calc;
-  $('bClr1').textContent=$('bClr2').textContent=d.clear;
-  $('bPrt1').textContent=$('bPrt2').textContent=d.print;
-  $('bMail1').textContent=$('bMail2').textContent=d.email;
-  // period select
-  if(prod==='prarthana'){ setOptions($('per'), Y, d.yr); setOptions($('per2'), Y, d.yr);} else { setOptions($('per'), M, d.mo); setOptions($('per2'), M, d.mo);} updateMdates(); speakInstructions(); }
-
-/* -----------------------------------------------------------
-   MATURITY DATE AUTO‑POPULATE
-----------------------------------------------------------------*/
-function calcMdate(open,val){ const d=new Date(open); prod==='prarthana'? d.setFullYear(d.getFullYear()+val): d.setMonth(d.getMonth()+val); return d.toISOString().split('T')[0]; }
-function updateMdates(){ $('mdate').value  = $('open').value  && $('per').value  ? calcMdate($('open').value,$('per').value)   : '';
-                          $('mdate2').value = $('open2').value && $('per2').value ? calcMdate($('open2').value,$('per2').value): ''; }
-['open','per','open2','per2'].forEach(id=>$(id).addEventListener('change',updateMdates));
-
-/* -----------------------------------------------------------
-   SPEECH HELPERS
-----------------------------------------------------------------*/
-function speak(text){ if(!text||!'speechSynthesis' in window) return; const u=new SpeechSynthesisUtterance(text); u.lang=curLang()==='si'?'si-LK':curLang()==='ta'?'ta-IN':'en-US'; speechSynthesis.cancel(); speechSynthesis.speak(u); }
-function speakInstructions(){ const d=TXT[curLang()]; const msg = prod==='prarthana'?d.req+': '+d.target: d.install; speak(msg); }
-
-/* -----------------------------------------------------------
-   MAIN CALCULATIONS
-----------------------------------------------------------------*/
-// Required Deposit tab
-function calcReq(){ const d=TXT[curLang()]; const open=$('open').value; const per=parseInt($('per').value); const r=parseFloat($('rate').value)/100; const target=parseFloat($('target').value);
-  if(!open||!per||isNaN(r)||isNaN(target)||target<=0){alert(d.msg1);return;} updateMdates(); let out='';
-  if(prod==='prarthana'){ // yearly compounding lump‑sum
-    const P= target / Math.pow(1+r, per);
-    out = `${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.yr}\n${d.resDep} LKR ${P.toFixed(2)}`;
+// Populate period selects based on product
+function populatePeriods() {
+  const perSel = $('per');
+  const perSel2 = $('per2');
+  perSel.innerHTML = '';
+  perSel2.innerHTML = '';
+  let options, labelSuffix;
+  if (prod === 'prarthana') {
+    options = Y;
+    labelSuffix = ' years';
   } else {
-    // EMI needed to reach target with monthly compounding
-    const i=r/12, n=per;
-    const emi= target*i / (Math.pow(1+i,n)-1);
-    out = `${d.target} ${target.toFixed(2)}\n${d.per} ${per} ${d.mo}\n${d.resEMI} LKR ${emi.toFixed(2)}`;
+    options = M;
+    labelSuffix = ' months';
   }
-  $('res1').textContent=out; speak(out); }
+  options.forEach(v => {
+    let opt1 = document.createElement('option');
+    opt1.value = v;
+    opt1.textContent = v + labelSuffix;
+    perSel.appendChild(opt1);
 
-// Maturity Value tab
-function calcMat(){ const d=TXT[curLang()]; const open=$('open2').value; const per=parseInt($('per2').value); const r=parseFloat($('rate2').value)/100; const amt=parseFloat($('amt').value);
-  if(!open||!per||isNaN(r)||isNaN(amt)||amt<=0){alert(d.msg1);return;} updateMdates(); let out='';
-  if(prod==='prarthana'){ // single deposit grows yearly
-    const A = amt * Math.pow(1+r, per);
-    out = `${d.deposit} ${amt.toFixed(2)}\n${d.per} ${per} ${d.yr}\n${d.resMat} LKR ${A.toFixed(2)}`;
+    let opt2 = opt1.cloneNode(true);
+    perSel2.appendChild(opt2);
+  });
+  updateMaturityDate();
+  updateMaturityDateMat();
+}
+
+// Update maturity date for Required Deposit (Prarthana: years, Reality: months)
+function updateMaturityDate() {
+  const openDate = new Date($('open').value);
+  const per = parseInt($('per').value, 10);
+  if (!openDate.getTime() || !per) {
+    $('mdate').value = '';
+    return;
+  }
+  let mdate = new Date(openDate);
+  if (prod === 'prarthana') {
+    mdate.setFullYear(mdate.getFullYear() + per);
   } else {
-    // monthly deposit grows monthly
-    const i=r/12, n=per; const A= amt*((Math.pow(1+i,n)-1)/i);
-    out = `${d.install} ${amt.toFixed(2)}\n${d.per} ${per} ${d.mo}\n${d.resMat} LKR ${A.toFixed(2)}`;
+    mdate.setMonth(mdate.getMonth() + per);
   }
-  $('res2').textContent=out; speak(out); }
+  $('mdate').value = mdate.toISOString().slice(0,10);
+}
 
-/* -----------------------------------------------------------
-   UTILITIES (reset / print / email)
-----------------------------------------------------------------*/
-function resetAll(){ ['formReq','formMat'].forEach(fid=>$(fid).reset()); ['res1','res2'].forEach(rid=>$(rid).textContent=''); updateMdates(); }
-function printRes(id){ const txt=$(id).textContent||'No result'; const win=window.open('','_blank'); win.document.write('<pre>'+txt+'</pre>'); win.print(); }
-function mailRes(id){ const txt=$(id).textContent; if(!txt)return; window.location=`mailto:?subject=NSB%20Result&body=${encodeURIComponent(txt)}`; }
+// Update maturity date for Maturity Value tab
+function updateMaturityDateMat() {
+  const openDate = new Date($('open2').value);
+  const per = parseInt($('per2').value, 10);
+  if (!openDate.getTime() || !per) {
+    $('mdate2').value = '';
+    return;
+  }
+  let mdate = new Date(openDate);
+  if (prod === 'prarthana') {
+    mdate.setFullYear(mdate.getFullYear() + per);
+  } else {
+    mdate.setMonth(mdate.getMonth() + per);
+  }
+  $('mdate2').value = mdate.toISOString().slice(0,10);
+}
 
-/* -----------------------------------------------------------
-   INITIALISE PAGE
-----------------------------------------------------------------*/
-applyLang();   // set default language + populate periods
+// Show tab content
+function showTab(tab) {
+  ['req', 'mat'].forEach(t => {
+    $(t).classList.toggle('active', t === tab);
+    $('tab' + (t==='req' ? 'Req' : 'Mat') + 'Btn').classList.toggle('active', t === tab);
+  });
+  // Reset results on tab change
+  resetResults();
+}
 
+// Reset all inputs and results
+function resetAll() {
+  ['formReq','formMat'].forEach(id => {
+    $(id).reset();
+  });
+  $('mdate').value = '';
+  $('mdate2').value = '';
+  resetResults();
+}
+
+// Reset result display
+function resetResults() {
+  $('res1').textContent = '';
+  $('res2').textContent = '';
+}
+
+// Calculate Required Deposit (Tab 1)
+function calcReq() {
+  const openDate = new Date($('open').value);
+  const per = parseInt($('per').value, 10);
+  const target = parseFloat($('target').value);
+  const rate = parseFloat($('rate').value) / 100; // convert % to decimal
+
+  if (!openDate.getTime() || isNaN(per) || isNaN(target) || isNaN(rate)) {
+    alert('Please fill all fields correctly.');
+    return;
+  }
+
+  let principal;
+  if (prod === 'prarthana') {
+    // Yearly compounding (Prarthana)
+    // Formula: P = A / (1 + r)^n
+    principal = target / Math.pow(1 + rate, per);
+  } else {
+    // Monthly compounding (Reality) - period in months, rate monthly
+    // Formula: P = A / (1 + r)^n
+    principal = target / Math.pow(1 + rate, per);
+  }
+
+  principal = Math.max(principal, 0);
+
+  let maturityDate = $('mdate').value || 'N/A';
+
+  const result = 
+    `Opening Date: ${$('open').value}\n` +
+    `Maturity Date: ${maturityDate}\n` +
+    `Period: ${per} ${prod === 'prarthana' ? 'years' : 'months'}\n` +
+    `Target Amount: LKR ${target.toFixed(2)}\n` +
+    `Interest Rate: ${ (rate * 100).toFixed(2) }% ${prod === 'prarthana' ? 'per year' : 'per month'}\n` +
+    `Required Deposit: LKR ${principal.toFixed(2)}`;
+
+  $('res1').textContent = result;
+  speakResult(result);
+}
+
+// Calculate Maturity Value (Tab 2)
+function calcMat() {
+  const openDate = new Date($('open2').value);
+  const per = parseInt($('per2').value, 10);
+  const monthlyInstallment = parseFloat($('amt').value);
+  const rate = parseFloat($('rate2').value) / 100; // monthly rate decimal
+
+  if (!openDate.getTime() || isNaN(per) || isNaN(monthlyInstallment) || isNaN(rate)) {
+    alert('Please fill all fields correctly.');
+    return;
+  }
+
+  // Compound Interest on Annuity (Monthly installment compound interest):
+  // A = P * [((1 + r)^n - 1) / r]
+  let maturityValue;
+  if (rate === 0) {
+    maturityValue = monthlyInstallment * per;
+  } else {
+    maturityValue = monthlyInstallment * (Math.pow(1 + rate, per) - 1) / rate;
+  }
+
+  maturityValue = Math.max(maturityValue, 0);
+
+  let maturityDate = $('mdate2').value || 'N/A';
+
+  const result = 
+    `Opening Date: ${$('open2').value}\n` +
+    `Maturity Date: ${maturityDate}\n` +
+    `Period: ${per} ${prod === 'prarthana' ? 'years' : 'months'}\n` +
+    `Monthly Installment: LKR ${monthlyInstallment.toFixed(2)}\n` +
+    `Interest Rate: ${(rate * 100).toFixed(2)}% per month\n` +
+    `Maturity Value: LKR ${maturityValue.toFixed(2)}`;
+
+  $('res2').textContent = result;
+  speakResult(result);
+}
+
+// Print result by element id
+function printRes(id) {
+  const content = $(id).textContent;
+  if (!content) {
+    alert('Nothing to print!');
+    return;
+  }
+  const printWindow = window.open('', '', 'width=600,height=400');
+  printWindow.document.write('<pre>' + content + '</pre>');
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+
+// Email result by opening mail client (mailto)
+function mailRes(id) {
+  const content = $(id).textContent;
+  if (!content) {
+    alert('Nothing to email!');
+    return;
+  }
+  const subject = encodeURIComponent('NSB Savings Calculator Result');
+  const body = encodeURIComponent(content);
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+// Show tab content handler called by tabs
+function showTab(tab) {
+  ['req','mat'].forEach(t=>{
+    $(t).classList.toggle('active', t===tab);
+    $('tab'+(t==='req'?'Req':'Mat')+'Btn').classList.toggle('active', t===tab);
+  });
+  resetResults();
+}
+
+// Reset all inputs and results
+function resetAll() {
+  ['formReq','formMat'].forEach(id => $(id).reset());
+  $('mdate').value = '';
+  $('mdate2').value = '';
+  resetResults();
+}
+
+// Reset result display
+function resetResults() {
+  $('res1').textContent = '';
+  $('res2').textContent = '';
+}
+
+// Update language-dependent labels and reload periods
+function applyLang() {
+  const d = TXT[curLang()];
+  // Title changes by product
+  $('title').textContent = prod === 'prarthana' ? d.titlePr : d.titleRe;
+  document.title = $('title').textContent;
+  $('title').textContent = $('title').textContent;
+  $('txtReq').textContent = d.req;
+  $('txtMat').textContent = d.mat;
+
+  // Labels for Required Deposit tab
+  $('lblOpen').textContent = d.open;
+  $('lblPer').textContent = d.per;
+  $('lblMdate').textContent = d.matDate;
+  $('lblTarget').textContent = d.target;
+  $('lblRate').textContent = prod === 'prarthana' ? d.rateYr : d.rateMo;
+
+  // Labels for Maturity Value tab
+  $('lblOpen2').textContent = d.open;
+  $('lblPer2').textContent = d.per;
+  $('lblMdate2').textContent = d.matDate;
+  $('lblAmt').textContent = d.install;
+  $('lblRate2').textContent = d.rateMo;
+
+  // Buttons
+  $('bCalc1').textContent = d.calc;
+  $('bClr1').textContent = d.clear;
+  $('bPrt1').textContent = d.print;
+  $('bMail1').textContent = d.email;
+
+  $('bCalc2').textContent = d.calc;
+  $('bClr2').textContent = d.clear;
+  $('bPrt2').textContent = d.print;
+  $('bMail2').textContent = d.email;
+
+  populatePeriods();
+  updateMaturityDate();
+  updateMaturityDateMat();
+  resetResults();
+}
+
+// Text-to-speech for results (reads result aloud in selected language)
+function speakResult(text) {
+  if (!('speechSynthesis' in window)) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  const lang = curLang();
+  if (lang === 'si') utter.lang = 'si-LK';
+  else if (lang === 'ta') utter.lang = 'ta-IN';
+  else utter.lang = 'en-US';
+  window.speechSynthesis.speak(utter);
+}
+
+// Initialize
+function init() {
+  setProduct(prod);
+  applyLang();
+  showTab('req');
+}
+
+init();
 </script>
+
 </body>
 </html>
+
