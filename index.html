@@ -158,6 +158,21 @@
       color: var(--dark);
       opacity: 0.5;
     }
+
+    @media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  input, button, select {
+    font-size: 16px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .schedule-table table, .schedule-table th, .schedule-table td {
+    font-size: 12px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -178,6 +193,7 @@
       <div class="tab" id="tabMaturity" onclick="showTab('maturity')">💰 Maturity Value</div>
     </div>
 
+    <!-- Required Deposit -->
     <div id="required" class="tab-content active">
       <form id="formRequired" onsubmit="event.preventDefault(); calculateRequired();">
         <label for="open">Opening Date</label>
@@ -190,7 +206,8 @@
         <input id="mdate" type="date" disabled />
 
         <label for="target">Target Amount (LKR)</label>
-        <input id="target" type="number" min="0" required />
+        <!-- allow decimals -->
+        <input id="target" type="number" step="0.01" min="0" required />
 
         <label for="rate" id="rateLabel">Interest Rate (% per year)</label>
         <input id="rate" type="number" step="0.01" min="0" required />
@@ -204,6 +221,7 @@
       <div class="result" id="resultRequired"></div>
     </div>
 
+    <!-- Maturity Value -->
     <div id="maturity" class="tab-content">
       <form id="formMaturity" onsubmit="event.preventDefault(); calculateMaturity();">
         <label for="open2">Opening Date</label>
@@ -216,9 +234,10 @@
         <input id="mdate2" type="date" disabled />
 
         <label id="installmentLabel" for="installment">Deposit Amount (LKR)</label>
-        <input id="installment" type="number" min="0" required />
+        <!-- allow decimals -->
+        <input id="installment" type="number" step="0.01" min="0" required />
 
-        <label for="rate2" id="rateLabel2">Interest Rate</label>
+        <label for="rate2" id="rateLabel2">Interest Rate (% per year)</label>
         <input id="rate2" type="number" step="0.01" min="0" required />
 
         <div class="button-row">
@@ -236,10 +255,11 @@
     let soundOn = true;
 
     const periods = {
-      prarthana: [3, 5, 10, 15, 20],
-      reality: [12, 24, 36, 48, 60]
+      prarthana: [3, 5, 10, 15, 20],   // years
+      reality:   [12, 24, 36, 48, 60]  // months
     };
 
+    // ---------------- UI Helpers ------------------
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("open");
     }
@@ -248,11 +268,7 @@
       soundOn = !soundOn;
       const icon = document.getElementById("soundIcon");
       icon.classList.toggle("off", !soundOn);
-      if (soundOn) {
-        speak("Sound On");
-      } else {
-        speak("Sound Off");
-      }
+      speak(soundOn ? "Sound On" : "Sound Off");
     }
 
     function speak(message) {
@@ -262,20 +278,22 @@
       synth.speak(utter);
     }
 
+    // ---------------- Product Switching ------------------
     function setProduct(product) {
       currentProduct = product;
       document.getElementById("title").innerText =
-        product === 'prarthana' ? 'NSB Prarthana Savings Calculator' : 'NSB Reality Savings Calculator';
+        product === 'prarthana' ?
+          'NSB Prarthana Savings Calculator' :
+          'NSB Reality Savings Calculator';
 
       document.getElementById("installmentLabel").innerText =
         product === 'prarthana' ? 'Deposit Amount (LKR)' : 'Monthly Installment (LKR)';
 
-      // Clear forms and results
+      // Reset forms & populate periods
       document.getElementById("formRequired").reset();
       document.getElementById("formMaturity").reset();
       clearResult('resultRequired');
       clearResult('resultMaturity');
-
       populatePeriods();
       updateMaturityDate();
       updateMaturityDate2();
@@ -295,10 +313,12 @@
       period2.innerHTML = "";
       periods[currentProduct].forEach(p => {
         const unit = currentProduct === 'prarthana' ? 'year' : 'month';
+        // Option for Required tab
         let opt1 = document.createElement("option");
         opt1.value = p;
         opt1.text = `${p} ${unit}${p > 1 ? 's' : ''}`;
         period1.appendChild(opt1);
+        // Option for Maturity tab
         let opt2 = document.createElement("option");
         opt2.value = p;
         opt2.text = `${p} ${unit}${p > 1 ? 's' : ''}`;
@@ -306,14 +326,15 @@
       });
     }
 
+    // ---------------- Maturity Date helpers ------------------
     function updateMaturityDate() {
-      const openVal = document.getElementById("open").value;
+      const openVal   = document.getElementById("open").value;
       const periodVal = document.getElementById("period").value;
       if (!openVal || !periodVal) {
         document.getElementById("mdate").value = "";
         return;
       }
-      const open = new Date(openVal);
+      const open   = new Date(openVal);
       const period = parseInt(periodVal);
 
       if (currentProduct === 'prarthana') {
@@ -325,13 +346,13 @@
     }
 
     function updateMaturityDate2() {
-      const openVal = document.getElementById("open2").value;
+      const openVal   = document.getElementById("open2").value;
       const periodVal = document.getElementById("period2").value;
       if (!openVal || !periodVal) {
         document.getElementById("mdate2").value = "";
         return;
       }
-      const open = new Date(openVal);
+      const open   = new Date(openVal);
       const period = parseInt(periodVal);
 
       if (currentProduct === 'prarthana') {
@@ -342,9 +363,10 @@
       document.getElementById("mdate2").value = open.toISOString().slice(0, 10);
     }
 
+    // ---------------- Calculations ------------------
     function calculateRequired() {
       const target = parseFloat(document.getElementById("target").value);
-      const rate = parseFloat(document.getElementById("rate").value) / 100;
+      const rate   = parseFloat(document.getElementById("rate").value) / 100; // annual -> decimal
       const period = parseInt(document.getElementById("period").value);
       if (isNaN(target) || isNaN(rate) || isNaN(period)) {
         alert("Please enter valid values.");
@@ -353,24 +375,27 @@
 
       let result = "";
       if (currentProduct === 'prarthana') {
-        // yearly compounding: P = Target / (1 + r)^t
-        let P = target / Math.pow(1 + rate, period);
-        result = `Required Deposit Today: LKR ${P.toFixed(2)}`;
+        // --- Prarthana: yearly compounding (lump‑sum) ---
+        // P = Target / (1 + r)^t
+        const P = target / Math.pow(1 + rate, period);
+        result = `Required Deposit Today: LKR ${P.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       } else {
-        // monthly compounding with monthly installment: M = Target * r / ((1 + r)^n -1)
-        let r = rate / 12;
-        let n = period;
-        let M = target * r / (Math.pow(1 + r, n) - 1);
-        result = `Monthly Installment Needed: LKR ${M.toFixed(2)}`;
+        // --- Reality: Monthly deposits (annuity‑due) ---
+        // M = Target * r / ((1+r)^n - 1) / (1+r)
+        const r = rate / 12;           // monthly rate
+        const n = period;              // number of months
+        const M = target * r / (Math.pow(1 + r, n) - 1) / (1 + r);
+        result = `Monthly Installment Needed: LKR ${M.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       }
+
       document.getElementById("resultRequired").innerText = result;
       speak(result);
     }
 
     function calculateMaturity() {
       const deposit = parseFloat(document.getElementById("installment").value);
-      const rate = parseFloat(document.getElementById("rate2").value) / 100;
-      const period = parseInt(document.getElementById("period2").value);
+      const rate    = parseFloat(document.getElementById("rate2").value) / 100;
+      const period  = parseInt(document.getElementById("period2").value);
       if (isNaN(deposit) || isNaN(rate) || isNaN(period)) {
         alert("Please enter valid values.");
         return;
@@ -378,27 +403,31 @@
 
       let result = "";
       if (currentProduct === 'prarthana') {
-        // yearly compounding: A = P*(1+r)^t
-        let A = deposit * Math.pow(1 + rate, period);
-        result = `Maturity Value: LKR ${A.toFixed(2)}`;
+        // --- Prarthana: yearly compounding ---
+        // A = P * (1 + r)^t
+        const A = deposit * Math.pow(1 + rate, period);
+        result = `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       } else {
-        // monthly compounding with monthly installment: A = M * ((1+r)^n -1)/r
-        let r = rate / 12;
-        let n = period;
-        let A = deposit * (Math.pow(1 + r, n) - 1) / r;
-        result = `Maturity Value: LKR ${A.toFixed(2)}`;
+        // --- Reality: Monthly deposits (annuity‑due) ---
+        // A = M * ((1+r)^n - 1) / r * (1+r)
+        const r = rate / 12;
+        const n = period;
+        const A = deposit * (Math.pow(1 + r, n) - 1) / r * (1 + r);
+        result = `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       }
+
       document.getElementById("resultMaturity").innerText = result;
       speak(result);
     }
 
+    // ---------------- Misc helpers ------------------
     function clearResult(id) {
       document.getElementById(id).innerText = "";
     }
 
     function printForm(formId) {
-      let form = document.getElementById(formId);
-      let printWindow = window.open('', '', 'width=600,height=600');
+      const form = document.getElementById(formId);
+      const printWindow = window.open('', '', 'width=600,height=600');
       printWindow.document.write('<html><head><title>Print</title></head><body>');
       printWindow.document.write('<h2>' + document.getElementById("title").innerText + '</h2>');
       printWindow.document.write(form.outerHTML);
@@ -409,6 +438,7 @@
       printWindow.close();
     }
 
+    // ---------------- Init ------------------
     window.onload = () => {
       setProduct(currentProduct);
       showTab('required');
