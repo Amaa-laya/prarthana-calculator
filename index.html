@@ -108,35 +108,51 @@
       width: 80px;
       height: auto;
     }
-    .tabs {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      gap: 8px;
+     /* Your tab styles */
+  .tab-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    gap: 8px;
+  }
+  .tab-item {
+    background: var(--grey);
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    user-select: none;
+    font-weight: bold;
+    color: var(--dark);
+    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif;
+    white-space: nowrap;
+    flex: 0 1 auto;
+    min-width: 140px;
+    text-align: center;
+  }
+  .tab.active {
+    background: var(--nsb);
+    color: #fff;
+  }
+  .tab-content {
+    display: none;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .tab-content.active {
+    display: block;
+  }
+
+  @media (max-width: 500px) {
+    .tab-item {
+      flex: 1 1 100%;
+      text-align: center;
     }
-    .tab {
-      background: var(--grey);
-      padding: 10px 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      user-select: none;
-      font-weight: bold;
-      color: var(--dark);
-      font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif;
-    }
-    .tab.active {
-      background: var(--nsb);
-      color: #fff;
-    }
-    .tab-content {
-      display: none;
-      /* remove margin bottom, spacing handled by row */
-    }
-    .tab-content.active {
-      display: block;
-    }
+  }
     form {
       border: 2px solid var(--nsb);
       padding: 20px;
@@ -261,6 +277,13 @@
         flex-direction: column;
       }
     }
+    footer {
+    margin-top: 40px;
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+    color: #888;
+  }
   </style>
 </head>
 <body>
@@ -290,11 +313,13 @@
     </div>
 
     <!-- Tabs for calculator forms -->
-    <div class="tabs">
-      <div class="tab active" id="tabRequired" onclick="showTab('required')">🪙 Required Deposit</div>
-      <div class="tab" id="tabMaturity" onclick="showTab('maturity')">💰 Maturity Value</div>
-    </div>
 
+    <div class="tab-row">
+    <div class="tab-item tab active" onclick="showTab(0)">🪙Required Deposit</div>
+    <div class="tab-item tab" onclick="showTab(1)">💰Maturity Value</div>
+  </div>
+
+  
     <div class="forms-row">
       <!-- Required Deposit Form -->
       <div id="required" class="tab-content active">
@@ -350,7 +375,14 @@
         <div class="result" id="resultMaturity"></div>
       </div>
     </div>
+
+    <footer>
+  &copy; 2025 National Savings Bank. All rights reserved.
+  </footer>
+
   </div>
+
+  
 
   <!-- jsPDF Library for saving PDFs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -717,6 +749,15 @@ window.onload = () => {
   updateUI();
   setupAllInputFormatting();
 };
+
+ function showTab(index) {
+    const tabs = document.querySelectorAll('.tab');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach((tab, i) => {
+      tab.classList.toggle('active', i === index);
+      contents[i].classList.toggle('active', i === index);
+    });
+  }
 
 </script>
 </body>
