@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NSB Savings Calculator</title>
   <style>
-    /* Color variables */
+     /* Color variables */
     :root {
       --nsb: #f58220;
       --grey: #e0e0e0;
@@ -16,9 +16,7 @@
       --text-light: #000;
       --text-dark: #fff;
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -35,6 +33,19 @@
       color: var(--text-dark);
     }
     .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+      max-width: 960px;
+      width: 100%;
+    }
+    body.dark-mode .container {
+      background: #2c2c2c;
+      color: var(--text-dark);
+
+    }
+     .container {
       background: #fff;
       padding: 30px;
       border-radius: 16px;
@@ -99,7 +110,6 @@
       font-size: 16px;
       text-align: center;
     }
-    /* NSB logo styling */
     .nsb-logo {
       text-align: center;
       margin-bottom: 16px;
@@ -108,51 +118,49 @@
       width: 80px;
       height: auto;
     }
-     /* Your tab styles */
-  .tab-row {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
-    gap: 8px;
-  }
-  .tab-item {
-    background: var(--grey);
-    padding: 10px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-    user-select: none;
-    font-weight: bold;
-    color: var(--dark);
-    font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif;
-    white-space: nowrap;
-    flex: 0 1 auto;
-    min-width: 140px;
-    text-align: center;
-  }
-  .tab.active {
-    background: var(--nsb);
-    color: #fff;
-  }
-  .tab-content {
-    display: none;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  }
-  .tab-content.active {
-    display: block;
-  }
-
-  @media (max-width: 500px) {
+    .tab-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      gap: 8px;
+    }
     .tab-item {
-      flex: 1 1 100%;
+      background: var(--grey);
+      padding: 10px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+      font-weight: bold;
+      color: var(--dark);
+      font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", Arial, sans-serif;
+      white-space: nowrap;
+      flex: 0 1 auto;
+      min-width: 140px;
       text-align: center;
     }
-  }
+    .tab-item.active {
+      background: var(--nsb);
+      color: #fff;
+    }
+    .tab-content {
+      display: none;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @media (max-width: 500px) {
+      .tab-item {
+        flex: 1 1 100%;
+        text-align: center;
+      }
+    }
     form {
       border: 2px solid var(--nsb);
       padding: 20px;
@@ -243,27 +251,23 @@
       width: auto;
       font-family: inherit;
     }
-
-    /* NEW: container for the two forms side by side */
     .forms-row {
       display: flex;
       gap: 20px;
       justify-content: center;
-      flex-wrap: wrap; /* allows wrapping on small screens */
+      flex-wrap: wrap;
     }
     .forms-row > div {
-      flex: 1 1 400px; /* flex-grow, flex-shrink, basis */
-      min-width: 280px; /* prevents shrinking too small */
-      max-width: 480px; /* max width for each form */
+      flex: 1 1 400px;
+      min-width: 280px;
+      max-width: 480px;
     }
-
     @media (max-width: 768px) {
       .forms-row {
         flex-direction: column;
         gap: 30px;
       }
     }
-
     @media (max-width: 600px) {
       .container {
         padding: 20px;
@@ -278,20 +282,18 @@
       }
     }
     footer {
-    margin-top: 40px;
-    text-align: center;
-    padding: 12px;
-    font-size: 14px;
-    color: #888;
-  }
+      margin-top: 40px;
+      text-align: center;
+      padding: 12px;
+      font-size: 14px;
+      color: #888;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Hamburger icon to toggle sidebar -->
   <span class="hamburger" onclick="toggleSidebar()">☰</span>
 
-  <!-- Sidebar navigation for product selection -->
   <nav id="sidebar" class="sidebar">
     <div class="nsb-logo">
       <img src="nsb.png" alt="NSB Logo" />
@@ -302,24 +304,18 @@
   </nav>
 
   <div class="container">
-    <!-- Title changes based on product & language -->
     <h2 id="title">NSB Prarthana Savings Calculator</h2>
 
     <div class="toolbar">
-      <!-- Language toggle button -->
       <button class="language-toggle" onclick="toggleLanguage()" id="langBtn">සිංහල</button>
-      <!-- Sound toggle icon -->
       <span id="soundIcon" class="sound-icon" onclick="toggleSound()">🔊</span>
     </div>
 
-    <!-- Tabs for calculator forms -->
-
     <div class="tab-row">
-    <div class="tab-item tab active" onclick="showTab(0)">🪙Required Deposit</div>
-    <div class="tab-item tab" onclick="showTab(1)">💰Maturity Value</div>
-  </div>
+      <div class="tab-item active" id="tabRequired" onclick="showTab(0)">🪙 Required Deposit</div>
+      <div class="tab-item" id="tabMaturity" onclick="showTab(1)">💰 Maturity Value</div>
+    </div>
 
-  
     <div class="forms-row">
       <!-- Required Deposit Form -->
       <div id="required" class="tab-content active">
@@ -334,14 +330,14 @@
           <input id="mdate" type="date" disabled />
 
           <label for="target" id="labelTarget">Target Amount (LKR)</label>
-          <input id="target" type="number" step="0.01" min="0" required />
+          <input id="target" type="text" required />
 
           <label for="rate" id="rateLabel">Interest Rate (% per year)</label>
-          <input id="rate" type="number" step="0.01" min="0" required />
+          <input id="rate" type="text" required />
 
           <div class="button-row">
             <button type="submit" id="calcBtn">🧮 Calculate</button>
-            <button type="reset" onclick="clearResult('resultRequired')" id="clearBtn">🧹 Clear</button>
+            <button type="reset" onclick="clearResult('resultRequired'); resetFormatting(['target', 'rate']);" id="clearBtn">🧹 Clear</button>
             <button type="button" onclick="saveFormAsPDF('formRequired', 'resultRequired', 'NSB_Prarthana_Savings_Calculator')" id="saveBtn">💾 Save as PDF</button>
           </div>
         </form>
@@ -361,14 +357,14 @@
           <input id="mdate2" type="date" disabled />
 
           <label for="installment" id="installmentLabel">Deposit Amount (LKR)</label>
-          <input id="installment" type="number" step="0.01" min="0" required />
+          <input id="installment" type="text" required />
 
           <label for="rate2" id="rateLabel2">Interest Rate (% per year)</label>
-          <input id="rate2" type="number" step="0.01" min="0" required />
+          <input id="rate2" type="text" required />
 
           <div class="button-row">
             <button type="submit" id="calcBtn2">🧮 Calculate</button>
-            <button type="reset" onclick="clearResult('resultMaturity')" id="clearBtn2">🧹 Clear</button>
+            <button type="reset" onclick="clearResult('resultMaturity'); resetFormatting(['installment', 'rate2']);" id="clearBtn2">🧹 Clear</button>
             <button type="button" onclick="saveFormAsPDF('formMaturity', 'resultMaturity', 'NSB_Reality_Savings_Calculator')" id="saveBtn2">💾 Save as PDF</button>
           </div>
         </form>
@@ -377,14 +373,10 @@
     </div>
 
     <footer>
-  &copy; 2025 National Savings Bank. All rights reserved.
-  </footer>
-
+      &copy; 2025 National Savings Bank. All rights reserved.
+    </footer>
   </div>
 
-  
-
-  <!-- jsPDF Library for saving PDFs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
@@ -394,13 +386,11 @@
     let soundOn = true;
     let currentLanguage = 'en';
 
-    // Period options by product
     const periods = {
       prarthana: [3, 5, 10, 15, 20],   // years
       reality: [12, 24, 36, 48, 60]    // months
     };
 
-    // Translations for labels and text
     const labels = {
       en: {
         titlePrarthana: "NSB Prarthana Savings Calculator",
@@ -436,12 +426,12 @@
       }
     };
 
-    // Sidebar toggle
+    // Toggle sidebar
     function toggleSidebar() {
       document.getElementById("sidebar").classList.toggle("open");
     }
 
-    // Toggle sound on/off with speech feedback
+    // Toggle sound and speak
     function toggleSound() {
       soundOn = !soundOn;
       const icon = document.getElementById("soundIcon");
@@ -449,7 +439,6 @@
       speak(soundOn ? (currentLanguage === 'en' ? "Sound On" : "ශබ්දය සක්‍රීයයි") : (currentLanguage === 'en' ? "Sound Off" : "ශබ්දය නිවැටයි"));
     }
 
-    // Speak text using Web Speech API
     function speak(text) {
       if (!soundOn) return;
       const synth = window.speechSynthesis;
@@ -458,307 +447,279 @@
       synth.speak(utter);
     }
 
-    // Switch between "prarthana" and "reality" products
+    // Set product and update UI
     function setProduct(product) {
       currentProduct = product;
 
-      // Update title
       const lang = labels[currentLanguage];
       document.getElementById("title").innerText = product === 'prarthana' ? lang.titlePrarthana : lang.titleReality;
-
-      // Update installment label based on product
       document.getElementById("installmentLabel").innerText = product === 'prarthana' ? lang.depositLabel : lang.monthlyLabel;
 
-      // Reset forms and results
       document.getElementById("formRequired").reset();
       document.getElementById("formMaturity").reset();
       clearResult('resultRequired');
       clearResult('resultMaturity');
 
-      // Populate period dropdowns for the selected product
       populatePeriods();
       updateMaturityDate();
       updateMaturityDate2();
 
-      // Update UI labels text for current language
       updateLanguage();
     }
 
-    // Show selected tab content and mark tab active
-    function showTab(id) {
-      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(id).classList.add('active');
-      document.getElementById('tab' + capitalizeFirstLetter(id)).classList.add('active');
+    // Show tab by index
+    function showTab(index) {
+      const tabs = document.querySelectorAll('.tab-item');
+      const contents = document.querySelectorAll('.tab-content');
+      tabs.forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+        contents[i].classList.toggle('active', i === index);
+      });
     }
 
-    // Capitalize first letter helper
-    function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-    // Populate period select inputs depending on product
+    // Populate period selects
     function populatePeriods() {
       const periodSelects = [document.getElementById('period'), document.getElementById('period2')];
       periodSelects.forEach(select => {
-        select.innerHTML = ''; // clear options
+        select.innerHTML = '';
         periods[currentProduct].forEach(p => {
           let option = document.createElement('option');
-          if (currentProduct === 'prarthana') {
-            option.value = p;
-            option.text = p + ' Years';
-          } else {
-            option.value = p;
-            option.text = p + ' Months';
-          }
+          option.value = p;
+          option.text = currentProduct === 'prarthana' ? p + ' Years' : p + ' Months';
           select.appendChild(option);
         });
       });
     }
 
-    
-    // ---------------- Maturity Date helpers ------------------
+    // Update maturity date (required deposit)
     function updateMaturityDate() {
-      const openVal   = document.getElementById("open").value;
+      const openVal = document.getElementById("open").value;
       const periodVal = document.getElementById("period").value;
+      const maturityInput = document.getElementById("mdate");
+
       if (!openVal || !periodVal) {
-        document.getElementById("mdate").value = "";
+        maturityInput.value = '';
         return;
       }
-      const open   = new Date(openVal);
-      const period = parseInt(periodVal);
 
+      const openDate = new Date(openVal);
       if (currentProduct === 'prarthana') {
-        open.setFullYear(open.getFullYear() + period);
+        openDate.setFullYear(openDate.getFullYear() + parseInt(periodVal));
       } else {
-        open.setMonth(open.getMonth() + period);
+        openDate.setMonth(openDate.getMonth() + parseInt(periodVal));
       }
-      document.getElementById("mdate").value = open.toISOString().slice(0, 10);
+      maturityInput.value = openDate.toISOString().slice(0, 10);
     }
 
+    // Update maturity date (maturity value)
     function updateMaturityDate2() {
-      const openVal   = document.getElementById("open2").value;
+      const openVal = document.getElementById("open2").value;
       const periodVal = document.getElementById("period2").value;
+      const maturityInput = document.getElementById("mdate2");
+
       if (!openVal || !periodVal) {
-        document.getElementById("mdate2").value = "";
+        maturityInput.value = '';
         return;
       }
-      const open   = new Date(openVal);
-      const period = parseInt(periodVal);
 
+      const openDate = new Date(openVal);
       if (currentProduct === 'prarthana') {
-        open.setFullYear(open.getFullYear() + period);
+        openDate.setFullYear(openDate.getFullYear() + parseInt(periodVal));
       } else {
-        open.setMonth(open.getMonth() + period);
+        openDate.setMonth(openDate.getMonth() + parseInt(periodVal));
       }
-      document.getElementById("mdate2").value = open.toISOString().slice(0, 10);
+      maturityInput.value = openDate.toISOString().slice(0, 10);
     }
 
-    // ---------------- Calculations ------------------
+    // Clear result
+    function clearResult(id) {
+      document.getElementById(id).innerText = '';
+    }
+
+    // Reset formatting on inputs
+    function resetFormatting(ids) {
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.value = el.value.replace(/,/g, '');
+      });
+    }
+
+    // Format input fields with thousands separators
+    function formatThousandsSeparators(input) {
+      let val = input.value.replace(/,/g, '');
+      if (!val) return;
+      if (isNaN(val)) return;
+      const parts = val.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      input.value = parts.join('.');
+    }
+
+    // Attach input event listeners for formatting
+    function attachInputFormatting(ids) {
+      ids.forEach(id => {
+        const input = document.getElementById(id);
+        input.addEventListener('input', () => formatThousandsSeparators(input));
+        input.addEventListener('blur', () => formatThousandsSeparators(input));
+      });
+    }
+
+    // Calculate Required Deposit or Monthly Installment
     function calculateRequired() {
-      const target = parseFloat(document.getElementById("target").value);
-      const rate   = parseFloat(document.getElementById("rate").value) / 100; // annual -> decimal
+      // Clean formatted inputs
+      resetFormatting(['target', 'rate']);
+
+      const target = parseFloat(document.getElementById("target").value.replace(/,/g, ''));
+      const rate = parseFloat(document.getElementById("rate").value.replace(/,/g, '')) / 100;
       const period = parseInt(document.getElementById("period").value);
       if (isNaN(target) || isNaN(rate) || isNaN(period)) {
-        alert("Please enter valid values.");
+        alert(currentLanguage === 'en' ? "Please enter valid values." : "කරුණාකර වලංගු අගයන් ඇතුළත් කරන්න.");
         return;
       }
 
       let result = "";
       if (currentProduct === 'prarthana') {
-        // --- Prarthana: yearly compounding (lump‑sum) ---
-        // P = Target / (1 + r)^t
+        // Lump sum yearly compounding
         const P = target / Math.pow(1 + rate, period);
-        result = `Required Deposit Today: LKR ${P.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        result = currentLanguage === 'en' 
+          ? `Required Deposit Today: LKR ${P.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
+          : `අද අවශ්‍ය තැන්පතු: රු ${P.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       } else {
-        // --- Reality: Monthly deposits (annuity‑due) ---
-        // M = Target * r / ((1+r)^n - 1) / (1+r)
-        const r = rate / 12;           // monthly rate
-        const n = period;              // number of months
-        const M = target * r / (Math.pow(1 + r, n) - 1) / (1 + r);
-        result = `Monthly Installment Needed: LKR ${M.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        // Monthly installment annuity due
+        const r = rate / 12;
+        const n = period;
+        const M = target * r / ( (Math.pow(1 + r, n) - 1) * (1 + r) );
+        result = currentLanguage === 'en'
+          ? `Monthly Installment Needed: LKR ${M.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+          : `මාසික වාරිකය අවශ්‍යයි: රු ${M.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       }
 
       document.getElementById("resultRequired").innerText = result;
       speak(result);
     }
 
+    // Calculate Maturity Value
     function calculateMaturity() {
-      const deposit = parseFloat(document.getElementById("installment").value);
-      const rate    = parseFloat(document.getElementById("rate2").value) / 100;
-      const period  = parseInt(document.getElementById("period2").value);
+      // Clean formatting
+      resetFormatting(['installment', 'rate2']);
+
+      const deposit = parseFloat(document.getElementById("installment").value.replace(/,/g, ''));
+      const rate = parseFloat(document.getElementById("rate2").value.replace(/,/g, '')) / 100;
+      const period = parseInt(document.getElementById("period2").value);
       if (isNaN(deposit) || isNaN(rate) || isNaN(period)) {
-        alert("Please enter valid values.");
+        alert(currentLanguage === 'en' ? "Please enter valid values." : "කරුණාකර වලංගු අගයන් ඇතුළත් කරන්න.");
         return;
       }
 
       let result = "";
       if (currentProduct === 'prarthana') {
-        // --- Prarthana: yearly compounding ---
-        // A = P * (1 + r)^t
+        // Lump sum yearly compounding maturity
         const A = deposit * Math.pow(1 + rate, period);
-        result = `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        result = currentLanguage === 'en'
+          ? `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+          : `මූල්‍ය අගය: රු ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       } else {
-        // --- Reality: Monthly deposits (annuity‑due) ---
-        // A = M * ((1+r)^n - 1) / r * (1+r)
+        // Monthly deposits annuity due maturity
         const r = rate / 12;
         const n = period;
-        const A = deposit * (Math.pow(1 + r, n) - 1) / r * (1 + r);
-        result = `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const A = deposit * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        result = currentLanguage === 'en'
+          ? `Maturity Value: LKR ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+          : `මූල්‍ය අගය: රු ${A.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
       }
 
       document.getElementById("resultMaturity").innerText = result;
       speak(result);
     }
 
-      document.getElementById('resultMaturity').innerText = resultText;
-      speak(resultText);
-    
-    // Clear result text
-    function clearResult(id) {
-      document.getElementById(id).innerText = '';
-    }
-
-    // Save form and result as PDF using jsPDF
-    function saveFormAsPDF(formId, resultId, fileName) {
-      const form = document.getElementById(formId);
-      const result = document.getElementById(resultId).innerText;
-
-      const pdf = new jsPDF();
-
-      pdf.setFontSize(18);
-      pdf.setTextColor('#f58220');
-      pdf.text(fileName.replace(/_/g, ' '), 10, 20);
-
-      pdf.setFontSize(12);
-      pdf.setTextColor('#000');
-
-      // Collect form data
-      let y = 30;
-      for (const element of form.elements) {
-        if (element.tagName.toLowerCase() === 'button' || element.disabled) continue;
-        if (element.type === 'submit' || element.type === 'reset' || element.type === 'button') continue;
-
-        const label = form.querySelector(`label[for="${element.id}"]`);
-        const labelText = label ? label.innerText : element.id;
-
-        pdf.text(`${labelText}: ${element.value}`, 10, y);
-        y += 10;
-      }
-
-      y += 10;
-      pdf.setFontSize(14);
-      pdf.setTextColor('#1976d2');
-      pdf.text('Result:', 10, y);
-      y += 8;
-
-      pdf.setFontSize(12);
-      pdf.setTextColor('#000');
-      pdf.text(result, 10, y);
-
-      pdf.save(fileName + '.pdf');
-    }
-
-    // Toggle dark mode
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    // Toggle language between English and Sinhala
+    // Toggle Language
     function toggleLanguage() {
       currentLanguage = currentLanguage === 'en' ? 'si' : 'en';
       updateLanguage();
     }
 
-    // Update all UI text based on currentLanguage and currentProduct
+    // Update language UI text
     function updateLanguage() {
       const lang = labels[currentLanguage];
+      document.getElementById("title").innerText = currentProduct === 'prarthana' ? lang.titlePrarthana : lang.titleReality;
 
-      document.getElementById('title').innerText = currentProduct === 'prarthana' ? lang.titlePrarthana : lang.titleReality;
-      document.getElementById('installmentLabel').innerText = currentProduct === 'prarthana' ? lang.depositLabel : lang.monthlyLabel;
-      document.getElementById('labelOpen').innerText = lang.openDate;
-      document.getElementById('labelOpen2').innerText = lang.openDate;
-      document.getElementById('labelPeriod').innerText = lang.period;
-      document.getElementById('labelPeriod2').innerText = lang.period;
-      document.getElementById('labelMdate').innerText = lang.maturityDate;
-      document.getElementById('labelMdate2').innerText = lang.maturityDate;
-      document.getElementById('rateLabel').innerText = lang.rate;
-      document.getElementById('rateLabel2').innerText = lang.rate;
-      document.getElementById('labelTarget').innerText = lang.target;
+      document.getElementById("labelOpen").innerText = lang.openDate;
+      document.getElementById("labelPeriod").innerText = lang.period;
+      document.getElementById("labelMdate").innerText = lang.maturityDate;
+      document.getElementById("labelTarget").innerText = lang.target;
+      document.getElementById("rateLabel").innerText = lang.rate;
 
-      document.getElementById('tabRequired').innerText = `🪙 ${lang.requiredTab}`;
-      document.getElementById('tabMaturity').innerText = `💰 ${lang.maturityTab}`;
+      document.getElementById("labelOpen2").innerText = lang.openDate;
+      document.getElementById("labelPeriod2").innerText = lang.period;
+      document.getElementById("labelMdate2").innerText = lang.maturityDate;
+      document.getElementById("installmentLabel").innerText = currentProduct === 'prarthana' ? lang.depositLabel : lang.monthlyLabel;
+      document.getElementById("rateLabel2").innerText = lang.rate;
 
-      document.getElementById('calcBtn').innerText = `🧮 ${lang.calculate}`;
-      document.getElementById('clearBtn').innerText = `🧹 ${lang.clear}`;
-      document.getElementById('saveBtn').innerText = `💾 ${lang.save}`;
+      document.getElementById("tabRequired").innerText = lang.requiredTab;
+      document.getElementById("tabMaturity").innerText = lang.maturityTab;
 
-      document.getElementById('calcBtn2').innerText = `🧮 ${lang.calculate}`;
-      document.getElementById('clearBtn2').innerText = `🧹 ${lang.clear}`;
-      document.getElementById('saveBtn2').innerText = `💾 ${lang.save}`;
+      document.getElementById("calcBtn").innerText = '🧮 ' + lang.calculate;
+      document.getElementById("clearBtn").innerText = '🧹 ' + lang.clear;
+      document.getElementById("saveBtn").innerText = '💾 ' + lang.save;
 
-      document.getElementById('langBtn').innerText = currentLanguage === 'en' ? 'සිංහල' : 'English';
+      document.getElementById("calcBtn2").innerText = '🧮 ' + lang.calculate;
+      document.getElementById("clearBtn2").innerText = '🧹 ' + lang.clear;
+      document.getElementById("saveBtn2").innerText = '💾 ' + lang.save;
+
+      document.getElementById("langBtn").innerText = currentLanguage === 'en' ? "සිංහල" : "English";
     }
 
-    // Initial setup on page load
-    window.onload = () => {
-      setProduct(currentProduct);
+    // Save form and result as PDF
+    function saveFormAsPDF(formId, resultId, title) {
+      const form = document.getElementById(formId);
+      const result = document.getElementById(resultId).innerText;
+      if (!result) {
+        alert(currentLanguage === 'en' ? "Please calculate first." : "පළමුව ගණනය කරන්න.");
+        return;
+      }
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text(title, 20, 20);
+
+      let y = 40;
+      // Add form fields to PDF
+      Array.from(form.elements).forEach(el => {
+        if (el.tagName.toLowerCase() === 'button' || el.disabled) return;
+        if (el.type === 'submit' || el.type === 'reset') return;
+        let label = "";
+        if (el.labels && el.labels[0]) label = el.labels[0].innerText + ": ";
+        else label = el.name + ": ";
+        let val = el.value;
+        doc.setFontSize(12);
+        doc.text(`${label} ${val}`, 20, y);
+        y += 10;
+      });
+
+      // Add result text
+      y += 10;
+      doc.setFontSize(14);
+      doc.text("Result:", 20, y);
+      y += 10;
+      doc.setFontSize(12);
+      const splitResult = doc.splitTextToSize(result, 170);
+      doc.text(splitResult, 20, y);
+
+      doc.save(title + ".pdf");
+    }
+
+    // Initial setup
+    function init() {
+      populatePeriods();
+      updateMaturityDate();
+      updateMaturityDate2();
+      attachInputFormatting(['target', 'rate', 'installment', 'rate2']);
       updateLanguage();
-    };
-    // Format input fields with commas on blur and remove commas on focus
-function setupInputFormatting(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  input.addEventListener('blur', () => {
-    // Format number with commas on blur
-    let val = input.value;
-    if (!val) return;
-    // Remove any existing commas
-    val = val.replace(/,/g, '');
-    // Check if valid number
-    if (!isNaN(val)) {
-      // Format with commas and keep decimals
-      const parts = val.split('.');
-      parts[0] = Number(parts[0]).toLocaleString('en-US');
-      input.value = parts.join('.');
     }
-  });
 
-  input.addEventListener('focus', () => {
-    // Remove commas on focus for easy editing
-    let val = input.value;
-    if (!val) return;
-    val = val.replace(/,/g, '');
-    input.value = val;
-  });
-}
-
-// Setup formatting for all relevant inputs
-function setupAllInputFormatting() {
-  const inputIds = [
-    'targetAmount', 'interestRate', 'periodInput',
-    'monthlyInstallment', 'interestRateMaturity', 'periodInputMaturity'
-  ];
-  inputIds.forEach(id => setupInputFormatting(id));
-}
-
-// Call on page load
-window.onload = () => {
-  updateUI();
-  setupAllInputFormatting();
-};
-
- function showTab(index) {
-    const tabs = document.querySelectorAll('.tab');
-    const contents = document.querySelectorAll('.tab-content');
-    tabs.forEach((tab, i) => {
-      tab.classList.toggle('active', i === index);
-      contents[i].classList.toggle('active', i === index);
-    });
-  }
-
-</script>
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+    // Start
+    init();
+  </script>
 </body>
 </html>
